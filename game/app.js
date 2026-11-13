@@ -10,6 +10,7 @@
   let activeBattle = null;
   let briefingStageId = null;
   let audioCtx = null;
+  const puzzleSessions = {};
 
   const mainEl = document.getElementById('main-content');
   const modalEl = document.getElementById('briefing-modal');
@@ -55,6 +56,15 @@
         return html;
       })
       .join('');
+  }
+
+  function shuffleArray(arr) {
+    const copy = arr.slice();
+    for (let i = copy.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy;
   }
 
   function playTone(type) {
@@ -103,9 +113,11 @@
 
   function updateHud() {
     const totalQuests = STAGES.reduce((sum, s) => sum + s.codingQuests.length, 0);
-    const progress = Engine.calcOverallProgress(state, STAGES.length, totalQuests);
+    const totalPuzzles = STAGES.filter((s) => Boolean(s.codePuzzle)).length;
+    const progress = Engine.calcOverallProgress(state, STAGES.length, totalQuests, totalPuzzles);
     const neededExp = Engine.expNeededForLevel(state.level);
     const pct = Math.min(100, Math.round((state.exp / neededExp) * 100));
+    const inv = state.inventory || { potion: 0, scan50: 0, charm2x: 0 };
 
     document.getElementById('player-title').textContent = Engine.getTitleForLevel(state.level);
     document.getElementById('player-level').textContent = `Lv.${state.level}`;
@@ -114,9 +126,11 @@
     document.getElementById('hud-cleared').textContent = `${progress.cleared} / ${progress.totalStages}章`;
     document.getElementById('hud-stars').textContent = `★ ${progress.stars} / ${progress.maxStars}`;
     document.getElementById('hud-quests').textContent = `${progress.solved} / ${progress.totalQuests}`;
+    document.getElementById('hud-puzzles').textContent = `パズル ${progress.solvedPuzzles} / ${progress.totalPuzzles}`;
     document.getElementById('hud-accuracy').textContent = `正答率 ${progress.accuracy}%`;
-    document.getElementById('hud-coins').textContent = `${state.coins} G`;
     document.getElementById('hud-combo').textContent = `最大コンボ ${state.maxCombo}`;
+    document.getElementById('hud-coins').textContent = `${state.coins} G`;
+    document.getElementById('hud-items').textContent = `🧪${inv.potion || 0} 🔍${inv.scan50 || 0} 🧿${inv.charm2x || 0}`;
     document.getElementById('weak-count-badge').textContent = String(state.wrongQuestionIds.length);
     document.getElementById('btn-sound').textContent = state.soundEnabled ? '🔊 効果音 ON' : '🔇 効果音 OFF';
     document.getElementById('btn-unlock-all').textContent = unlockAllMode ? '🔓 全章解放中' : '🔒 順次進行中';
@@ -139,6 +153,8 @@
     }
     if (currentView === 'map') renderMapView();
     else if (currentView === 'quests') renderQuestsView();
+    else if (currentView === 'puzzles') renderPuzzlesView();
+    else if (currentView === 'shop') renderShopView();
     else if (currentView === 'review') renderReviewView();
     else if (currentView === 'survival') renderSurvivalView();
     else if (currentView === 'badges') renderBadgesView();
@@ -149,12 +165,15 @@
   }
 
   function renderMapView() {
+    const totalStages = STAGES.length;
+    const nextStageNum = Math.min(totalStages, state.clearedStages.length + 1);
     const cards = STAGES.map((stage) => {
       const unlocked = unlockAllMode || Engine.isStageUnlocked(state, stage.id);
       const cleared = state.clearedStages.includes(stage.id);
       const stars = state.stageStars[stage.id] || 0;
       const best = state.stageBestScores[stage.id] || 0;
       const questsDone = stage.codingQuests.filter((q) => state.solvedQuests.includes(q.id)).length;
+      const puzzleDone = stage.codePuzzle && state.solvedPuzzles.includes(stage.codePuzzle.id);
 
       return `
         <article class="stage-card ${cleared ? 'cleared' : ''} ${!unlocked ? 'locked' : ''}">
@@ -173,9 +192,10 @@
               <p class="muted" style="font-size:0.78rem;">${escapeHtml(stage.monster.title)}（HP ${stage.monster.maxHp}）</p>
             </div>
           </div>
-          <div style="display:flex;justify-content:space-between;font-size:0.82rem;color:#cbd5e1;">
-            <span>クイズ最高: <strong>${best} / ${stage.questions.length}</strong></span>
-            <span>コード修復: <strong>${questsDone} / ${stage.codingQuests.length}</strong></span>
+          <div style="display:flex;justify-content:space-between;font-size:0.8rem;color:#cbd5e1;gap:6px;flex-wrap:wrap;">
+            <span>クイズ: <strong>${best}/${stage.questions.length}</strong></span>
+            <span>修復: <strong>${questsDone}/${stage.codingQuests.length}</strong></span>
+            <span>パズル: <strong>${puzzleDone ? '✅' : '0/1'}</strong></span>
           </div>
           <div class="stage-actions">
             <button class="btn btn-primary" data-action="open-briefing" data-stage="${stage.id}" ${!unlocked ? 'disabled' : ''}>
@@ -190,11 +210,11 @@
     mainEl.innerHTML = `
       <section class="section-banner">
         <div>
-          <h2>🗺️ Java Quest 冒険マップ（全10章）</h2>
-          <p class="muted">各章のモンスターをクイズバトルで倒し、コード修復クエストで「MyKakeibo Webアプリ」を完成させよう！</p>
+          <h2>🗺️ Java Quest 冒険マップ（全${totalStages}章）</h2>
+          <p class="muted">第1〜10章で家計簿Webアプリを完成させ、第11〜14章で SQL/JDBC・Stream/JSON API・JUnit・Maven/Spring Boot を攻略しよう！</p>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
-          <button class="btn btn-accent btn-sm" id="banner-quick-start">⚡ 第${Math.min(10, state.clearedStages.length + 1)}章へすぐ挑戦</button>
+          <button class="btn btn-accent btn-sm" id="banner-quick-start">⚡ 第${nextStageNum}章へすぐ挑戦</button>
         </div>
       </section>
       <div class="stage-grid">${cards}</div>
@@ -205,10 +225,7 @@
     });
     const quickBtn = document.getElementById('banner-quick-start');
     if (quickBtn) {
-      quickBtn.addEventListener('click', () => {
-        const nextStage = Math.min(10, state.clearedStages.length + 1);
-        openBriefing(nextStage);
-      });
+      quickBtn.addEventListener('click', () => openBriefing(nextStageNum));
     }
   }
 
@@ -257,6 +274,8 @@
   function startBattle(mode, options) {
     closeBriefing();
     const maxHp = Engine.calcMaxHp(state.level);
+    const totalStages = STAGES.length;
+    const totalAllQuestions = STAGES.reduce((sum, s) => sum + s.questions.length, 0);
     let questions = [];
     let title = '';
     let monster = null;
@@ -294,20 +313,15 @@
       STAGES.forEach((s) => {
         s.questions.forEach((q) => allPool.push({ ...q, stageId: s.id }));
       });
-      // Fisher-Yates shuffle
-      for (let i = allPool.length - 1; i > 0; i -= 1) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [allPool[i], allPool[j]] = [allPool[j], allPool[i]];
-      }
-      questions = allPool.slice(0, 10);
-      stageId = 5;
-      title = '⏱️ 全10章 ランダム10問試験';
+      questions = shuffleArray(allPool).slice(0, 10);
+      stageId = 7;
+      title = `⏱️ 全${totalStages}章 ランダム10問試験`;
       monster = {
         name: 'ランダム試験キメラ',
         title: '全章から出題する試練の魔獣',
         emoji: '🦁',
-        maxHp: 130,
-        intro: '「全100問の中からランダムに10問を出題するぞ！」',
+        maxHp: 140,
+        intro: `「全${totalAllQuestions}問の中からランダムに10問を出題するぞ！」`,
         defeat: '「どんな問題にも対応できる実力、お見事！」',
       };
     }
@@ -331,6 +345,9 @@
       earnedExp: 0,
       earnedCoins: 0,
       totalQuestions: questions.length,
+      eliminatedChoices: [],
+      charmActive: false,
+      itemNotice: null,
       lastFeedback: null,
       finished: false,
       lastResult: null,
@@ -339,13 +356,34 @@
     render();
   }
 
+  function handleUseBattleItem(itemId) {
+    if (!activeBattle || activeBattle.lastFeedback || activeBattle.finished) return;
+    const q = activeBattle.questions[activeBattle.index];
+    const res = Engine.useBattleItem(state, activeBattle, itemId, { correctAnswer: q.answer });
+    if (!res.ok) {
+      activeBattle.itemNotice = `⚠️ ${res.reason}`;
+      render();
+      return;
+    }
+    state = res.state;
+    activeBattle = res.battleState;
+    activeBattle.itemNotice = res.message;
+    saveState();
+    playTone('hit');
+    render();
+  }
+
   function handleChoice(choiceKey) {
     if (!activeBattle || activeBattle.lastFeedback || activeBattle.finished) return;
+    if (Array.isArray(activeBattle.eliminatedChoices) && activeBattle.eliminatedChoices.includes(choiceKey)) {
+      return;
+    }
     const q = activeBattle.questions[activeBattle.index];
     const isCorrect = choiceKey === q.answer;
 
     const outcome = Engine.applyAnswerResult(activeBattle, isCorrect, q.stageId || activeBattle.stageId);
     activeBattle = outcome.battleState;
+    activeBattle.itemNotice = null;
 
     state = Engine.updateQuestionTracking(state, q.id, isCorrect);
     const expRes = Engine.addExpAndCoins(state, outcome.earnedExp, outcome.earnedCoins);
@@ -363,6 +401,7 @@
       damageTaken: outcome.damageTaken,
       earnedExp: outcome.earnedExp,
       earnedCoins: outcome.earnedCoins,
+      criticalCharm: outcome.criticalCharm,
       leveledUp: expRes.leveledUp,
     };
 
@@ -381,6 +420,8 @@
 
     activeBattle.index += 1;
     activeBattle.lastFeedback = null;
+    activeBattle.eliminatedChoices = [];
+    activeBattle.itemNotice = null;
     render();
   }
 
@@ -422,8 +463,8 @@
       const stageClearedMsg =
         b.mode === 'stage'
           ? res.cleared
-            ? `🎉 ステージクリア！獲得スター: ${renderStars(res.stars)}（次のステージとコード修復に挑戦しよう！）`
-            : '💀 惜しくも敗北…！60%以上の正答＆HP残存でステージクリアです。チートシートを見て再挑戦しよう！'
+            ? `🎉 ステージクリア！獲得スター: ${renderStars(res.stars)}（コード修復やパズルにも挑戦しよう！）`
+            : '💀 惜しくも敗北…！60%以上の正答＆HP残存でステージクリアです。ショップのアイテムやチートシートも活用しよう！'
           : res.cleared
           ? '🎉 特訓クリア！この調子でJavaスキルを定着させよう！'
           : '💪 終了！間違えた問題は「弱点特訓アリーナ」に記録されました。';
@@ -444,7 +485,8 @@
             </div>
             <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
               <button class="btn btn-primary" id="btn-retry-battle">🔄 もう一度戦う</button>
-              ${b.mode === 'stage' ? `<button class="btn btn-accent" id="btn-go-quests">💻 この章のコード修復へ</button>` : ''}
+              ${b.mode === 'stage' ? `<button class="btn btn-accent" id="btn-go-quests">💻 コード修復へ</button>` : ''}
+              ${b.mode === 'stage' ? `<button class="btn btn-success" id="btn-go-puzzles">🧩 パズルへ</button>` : ''}
               <button class="btn btn-ghost" id="btn-back-map">🗺️ マップへ戻る</button>
             </div>
           </div>
@@ -456,6 +498,8 @@
       });
       const qBtn = document.getElementById('btn-go-quests');
       if (qBtn) qBtn.addEventListener('click', () => setActiveTab('quests'));
+      const pBtn = document.getElementById('btn-go-puzzles');
+      if (pBtn) pBtn.addEventListener('click', () => setActiveTab('puzzles'));
       document.getElementById('btn-back-map').addEventListener('click', () => setActiveTab('map'));
       return;
     }
@@ -466,16 +510,43 @@
     const fb = b.lastFeedback;
     const hitMonsterClass = fb && fb.isCorrect ? 'hit' : '';
     const hitPlayerClass = fb && !fb.isCorrect ? 'hit' : '';
+    const inv = state.inventory || { potion: 0, scan50: 0, charm2x: 0 };
+    const eliminated = Array.isArray(b.eliminatedChoices) ? b.eliminatedChoices : [];
+
+    const itemButtonsHtml = !fb
+      ? `
+        <div class="battle-items-bar">
+          <span class="battle-items-label">🎒 アイテム:</span>
+          ${Engine.SHOP_ITEMS.map((item) => {
+            const count = inv[item.id] || 0;
+            const disabled =
+              count <= 0 ||
+              (item.id === 'potion' && b.playerHp >= b.playerMaxHp) ||
+              (item.id === 'scan50' && eliminated.length > 0) ||
+              (item.id === 'charm2x' && b.charmActive);
+            return `
+              <button class="item-use-btn" data-use-item="${item.id}" ${disabled ? 'disabled' : ''} title="${escapeHtml(item.desc)}">
+                ${item.icon} ${escapeHtml(item.name)} (<strong>${count}</strong>)
+              </button>
+            `;
+          }).join('')}
+          ${b.charmActive ? '<span class="combo-badge">🧿 ダメージ&EXP 2倍中!</span>' : ''}
+        </div>
+        ${b.itemNotice ? `<div class="item-notice">${escapeHtml(b.itemNotice)}</div>` : ''}
+      `
+      : '';
 
     const choicesHtml = ['A', 'B', 'C', 'D']
       .map((key) => {
+        const isEliminated = eliminated.includes(key);
         let cls = 'choice-btn';
+        if (isEliminated && !fb) cls += ' eliminated';
         if (fb) {
           if (key === fb.correct) cls += ' correct';
           else if (key === fb.selected && !fb.isCorrect) cls += ' wrong';
         }
         return `
-          <button class="${cls}" data-choice="${key}" ${fb ? 'disabled' : ''}>
+          <button class="${cls}" data-choice="${key}" ${fb || isEliminated ? 'disabled' : ''}>
             <span class="choice-key">${key}</span>
             <span>${renderRichText(q.choices[key])}</span>
           </button>
@@ -489,7 +560,7 @@
           <div class="feedback-title">
             ${
               fb.isCorrect
-                ? `⚔️ 正解！モンスターに ${fb.damageDealt} ダメージ！（+${fb.earnedExp} EXP / +${fb.earnedCoins} G）`
+                ? `⚔️ 正解！モンスターに ${fb.damageDealt} ダメージ！（+${fb.earnedExp} EXP / +${fb.earnedCoins} G）${fb.criticalCharm ? ' 🧿2倍!' : ''}`
                 : `💥 不正解… ${fb.damageTaken} ダメージを受けた！（正解: ${fb.correct}）`
             }
             ${fb.leveledUp > 0 ? ' 🌟 LEVEL UP!' : ''}
@@ -552,6 +623,7 @@
             <span>キー操作: A/B/C/D または 1/2/3/4</span>
           </div>
           <div class="question-prompt">${renderRichText(q.prompt)}</div>
+          ${itemButtonsHtml}
           <div class="choices-grid">${choicesHtml}</div>
           ${feedbackHtml}
         </div>
@@ -559,6 +631,9 @@
     `;
 
     document.getElementById('btn-flee').addEventListener('click', () => setActiveTab('map'));
+    mainEl.querySelectorAll('[data-use-item]').forEach((btn) => {
+      btn.addEventListener('click', () => handleUseBattleItem(btn.dataset.useItem));
+    });
     mainEl.querySelectorAll('[data-choice]').forEach((btn) => {
       btn.addEventListener('click', () => handleChoice(btn.dataset.choice));
     });
@@ -567,6 +642,7 @@
   }
 
   function renderQuestsView() {
+    const totalQuests = STAGES.reduce((sum, s) => sum + s.codingQuests.length, 0);
     const sections = STAGES.map((stage) => {
       const questsHtml = stage.codingQuests
         .map((quest) => {
@@ -619,8 +695,8 @@
     mainEl.innerHTML = `
       <section class="section-banner">
         <div>
-          <h2>💻 コード修復クエスト（全20問）</h2>
-          <p class="muted">各章の演習で扱う Java / JSP コードの空欄を埋めて、家計簿アプリを完成させよう！</p>
+          <h2>💻 コード修復クエスト（全${totalQuests}問）</h2>
+          <p class="muted">各章の演習で扱う Java / JSP / SQL / JUnit / Spring Boot コードの空欄を埋めて、アプリを完成させよう！</p>
         </div>
       </section>
       ${sections}
@@ -677,6 +753,244 @@
     });
   }
 
+  function ensurePuzzleSession(puzzle, forceReset) {
+    if (!puzzleSessions[puzzle.id] || forceReset) {
+      const items = puzzle.steps.map((text, idx) => ({ key: `${puzzle.id}_${idx}`, text }));
+      puzzleSessions[puzzle.id] = {
+        pool: shuffleArray(items),
+        chosen: [],
+        feedback: null,
+      };
+    }
+    return puzzleSessions[puzzle.id];
+  }
+
+  function renderPuzzlesView() {
+    const puzzleStages = STAGES.filter((s) => Boolean(s.codePuzzle));
+    const cardsHtml = puzzleStages
+      .map((stage) => {
+        const p = stage.codePuzzle;
+        const solved = state.solvedPuzzles.includes(p.id);
+        const session = ensurePuzzleSession(p, false);
+
+        const poolHtml =
+          session.pool.length > 0
+            ? session.pool
+                .map(
+                  (item) => `
+                <button class="puzzle-step-btn" data-puzzle-add="${p.id}:${item.key}">
+                  <span>${escapeHtml(item.text)}</span>
+                  <span style="color:#38bdf8;font-size:0.75rem;">＋ 追加</span>
+                </button>
+              `
+                )
+                .join('')
+            : '<p class="muted" style="font-size:0.82rem;">すべての行を選択済みです。右側の組み立て欄を確認して判定しよう！</p>';
+
+        const chosenHtml =
+          session.chosen.length > 0
+            ? session.chosen
+                .map(
+                  (item, idx) => `
+                <button class="puzzle-step-btn selected-step" data-puzzle-remove="${p.id}:${item.key}">
+                  <span style="display:flex;align-items:center;gap:8px;">
+                    <span class="puzzle-step-index">${idx + 1}</span>
+                    <span>${escapeHtml(item.text)}</span>
+                  </span>
+                  <span style="color:#f87171;font-size:0.75rem;">✕ 戻す</span>
+                </button>
+              `
+                )
+                .join('')
+            : '<p class="muted" style="font-size:0.82rem;">左の候補から、正しい実行順になるように行をクリックしてください。</p>';
+
+        return `
+          <div class="puzzle-card ${solved ? 'solved' : ''}" id="puzzle-${p.id}">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
+              <div>
+                <span class="stage-chip">STAGE ${stage.id}</span>
+                <strong style="margin-left:8px;">${escapeHtml(p.title)}</strong>
+              </div>
+              <span>${solved ? '✅ クリア済み' : '🧩 未クリア (+40 EXP / +30 G)'}</span>
+            </div>
+            <p class="muted" style="margin-top:6px;">${renderRichText(p.description)}</p>
+            <div class="puzzle-columns">
+              <div class="puzzle-pane">
+                <div class="puzzle-pane-title">📦 コード部品（クリックで追加）</div>
+                <div class="puzzle-step-list">${poolHtml}</div>
+              </div>
+              <div class="puzzle-pane">
+                <div class="puzzle-pane-title">🧱 組み立てた順序（クリックで戻す）</div>
+                <div class="puzzle-step-list">${chosenHtml}</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">
+              <button class="btn btn-primary btn-sm" data-puzzle-check="${p.id}" ${session.chosen.length !== p.steps.length ? 'disabled' : ''}>✅ 順番を判定する</button>
+              <button class="btn btn-ghost btn-sm" data-puzzle-reset="${p.id}">🔄 シャッフルしてやり直す</button>
+              <button class="btn btn-ghost btn-sm" data-puzzle-hint="${p.id}">💡 ヒント</button>
+            </div>
+            <div style="margin-top:10px;">${session.feedback || ''}</div>
+          </div>
+        `;
+      })
+      .join('');
+
+    mainEl.innerHTML = `
+      <section class="section-banner">
+        <div>
+          <h2>🧩 コード構築パズル（全${puzzleStages.length}問）</h2>
+          <p class="muted">プログラムやSQLの「処理の正しい順番」を組み立てて、ロジックの流れを体で覚えよう！</p>
+        </div>
+      </section>
+      ${cardsHtml}
+    `;
+
+    mainEl.querySelectorAll('[data-puzzle-add]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const [pid, key] = btn.dataset.puzzleAdd.split(':');
+        const session = puzzleSessions[pid];
+        const idx = session.pool.findIndex((i) => i.key === key);
+        if (idx >= 0) {
+          const [picked] = session.pool.splice(idx, 1);
+          session.chosen.push(picked);
+          session.feedback = null;
+          renderPuzzlesView();
+        }
+      });
+    });
+
+    mainEl.querySelectorAll('[data-puzzle-remove]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const [pid, key] = btn.dataset.puzzleRemove.split(':');
+        const session = puzzleSessions[pid];
+        const idx = session.chosen.findIndex((i) => i.key === key);
+        if (idx >= 0) {
+          const [picked] = session.chosen.splice(idx, 1);
+          session.pool.push(picked);
+          session.feedback = null;
+          renderPuzzlesView();
+        }
+      });
+    });
+
+    mainEl.querySelectorAll('[data-puzzle-reset]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const pid = btn.dataset.puzzleReset;
+        const stage = puzzleStages.find((s) => s.codePuzzle.id === pid);
+        if (stage) {
+          ensurePuzzleSession(stage.codePuzzle, true);
+          renderPuzzlesView();
+        }
+      });
+    });
+
+    mainEl.querySelectorAll('[data-puzzle-hint]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const pid = btn.dataset.puzzleHint;
+        const stage = puzzleStages.find((s) => s.codePuzzle.id === pid);
+        if (!stage) return;
+        puzzleSessions[pid].feedback = `<div class="feedback-panel">💡 <strong>ヒント:</strong> ${renderRichText(stage.codePuzzle.hint)}</div>`;
+        renderPuzzlesView();
+      });
+    });
+
+    mainEl.querySelectorAll('[data-puzzle-check]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const pid = btn.dataset.puzzleCheck;
+        const stage = puzzleStages.find((s) => s.codePuzzle.id === pid);
+        if (!stage) return;
+        const p = stage.codePuzzle;
+        const session = puzzleSessions[pid];
+        const isCorrect =
+          session.chosen.length === p.steps.length &&
+          p.steps.every((stepText, idx) => session.chosen[idx].text === stepText);
+
+        if (isCorrect) {
+          const wasSolved = state.solvedPuzzles.includes(pid);
+          const res = Engine.recordPuzzleSolved(state, pid, 40, 30);
+          state = res.state;
+          saveState();
+          updateHud();
+          playTone('win');
+          session.feedback = `
+            <div class="feedback-panel ok">
+              <div class="feedback-title">🎉 正解！正しいアルゴリズム順です！${wasSolved ? '' : ' (+40 EXP / +30 G)'}${res.leveledUp > 0 ? ' 🌟 LEVEL UP!' : ''}</div>
+              <div>${renderRichText(p.explanation)}</div>
+            </div>
+          `;
+        } else {
+          playTone('miss');
+          session.feedback = `
+            <div class="feedback-panel ng">
+              <div class="feedback-title">❌ 順番が正しくありません</div>
+              <div class="muted">初期化・事前設定・実行・後処理の順番を見直してみよう！</div>
+            </div>
+          `;
+        }
+        renderPuzzlesView();
+      });
+    });
+  }
+
+  function renderShopView(noticeHtml) {
+    const inv = state.inventory || { potion: 0, scan50: 0, charm2x: 0 };
+    const cardsHtml = Engine.SHOP_ITEMS.map((item) => {
+      const owned = inv[item.id] || 0;
+      const canBuy = state.coins >= item.price;
+      return `
+        <article class="shop-card">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span class="shop-icon">${item.icon}</span>
+            <span class="shop-price">${item.price} G</span>
+          </div>
+          <div>
+            <h3 style="margin:0 0 4px;">${escapeHtml(item.name)}</h3>
+            <p class="muted">${escapeHtml(item.desc)}</p>
+          </div>
+          <div style="margin-top:auto;display:flex;justify-content:space-between;align-items:center;gap:10px;padding-top:8px;">
+            <span class="muted">所持数: <strong style="color:#fff;">${owned}個</strong></span>
+            <button class="btn btn-accent btn-sm" data-buy-item="${item.id}" ${!canBuy ? 'disabled' : ''}>
+              ${canBuy ? '🛒 購入する' : 'コイン不足'}
+            </button>
+          </div>
+        </article>
+      `;
+    }).join('');
+
+    mainEl.innerHTML = `
+      <section class="section-banner">
+        <div>
+          <h2>🛒 冒険者アイテムショップ</h2>
+          <p class="muted">バトルやクエストで稼いだコイン（G）を使って、ボス戦を有利に進めるアイテムを購入しよう！</p>
+        </div>
+        <div class="stat-pill">
+          <span class="stat-label">現在の所持コイン</span>
+          <strong>${state.coins} G</strong>
+        </div>
+      </section>
+      ${noticeHtml || ''}
+      <div class="shop-grid">${cardsHtml}</div>
+    `;
+
+    mainEl.querySelectorAll('[data-buy-item]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const res = Engine.buyShopItem(state, btn.dataset.buyItem);
+        if (!res.ok) {
+          playTone('miss');
+          renderShopView(`<div class="feedback-panel ng" style="margin-bottom:16px;">❌ ${escapeHtml(res.reason)}</div>`);
+          return;
+        }
+        state = res.state;
+        saveState();
+        updateHud();
+        playTone('hit');
+        renderShopView(
+          `<div class="feedback-panel ok" style="margin-bottom:16px;">✅ <strong>${escapeHtml(res.item.name)}</strong> を1個購入しました！（残り ${state.coins} G）</div>`
+        );
+      });
+    });
+  }
+
   function renderReviewView() {
     const count = state.wrongQuestionIds.length;
     mainEl.innerHTML = `
@@ -704,18 +1018,20 @@
   }
 
   function renderSurvivalView() {
+    const totalStages = STAGES.length;
+    const totalQuestions = STAGES.reduce((sum, s) => sum + s.questions.length, 0);
     mainEl.innerHTML = `
       <section class="section-banner">
         <div>
-          <h2>⏱️ 全10章 ランダム10問試験</h2>
-          <p class="muted">第1回〜第10回の全100問からランダムに10問が出題される総合実力テストです。</p>
+          <h2>⏱️ 全${totalStages}章 ランダム10問試験</h2>
+          <p class="muted">第1回〜第${totalStages}回の全${totalQuestions}問からランダムに10問が出題される総合実力テストです。</p>
         </div>
       </section>
       <div class="battle-shell" style="text-align:center;padding:34px 20px;">
         <div style="font-size:3rem;">🦁</div>
-        <h3>全100問シャッフルバトル</h3>
+        <h3>全${totalQuestions}問シャッフルバトル</h3>
         <p class="muted" style="margin-bottom:18px;">
-          基礎構文・オブジェクト指向・Servlet/JSP・MVC・DAO・セキュリティまで満遍なく出題されます。
+          基礎構文・OOP・Servlet/JSP・MVC・DAO・SQL/JDBC・Stream/JSON API・JUnit・Spring Boot まで満遍なく出題されます。
         </p>
         <button class="btn btn-accent btn-lg" id="btn-start-survival">🔥 ランダム10問に挑戦！</button>
       </div>
@@ -724,6 +1040,7 @@
   }
 
   function renderBadgesView() {
+    const totalStages = STAGES.length;
     const badgesHtml = STAGES.map((stage) => {
       const unlocked = state.unlockedBadges.includes(stage.badge.id);
       const stars = state.stageStars[stage.id] || 0;
@@ -741,7 +1058,7 @@
       <section class="section-banner">
         <div>
           <h2>🏆 図鑑・バッジコレクション</h2>
-          <p class="muted">各章のモンスターを倒すとバッジが解放されます。全10章制覇を目指そう！</p>
+          <p class="muted">各章のモンスターを倒すとバッジが解放されます。全${totalStages}章制覇を目指そう！</p>
         </div>
       </section>
       <div class="badge-grid">${badgesHtml}</div>
@@ -774,7 +1091,7 @@
   });
 
   document.getElementById('btn-reset').addEventListener('click', () => {
-    if (window.confirm('セーブデータ（レベル・スター・獲得バッジ・正答履歴）を初期化しますか？')) {
+    if (window.confirm('セーブデータ（レベル・スター・獲得バッジ・正答履歴・アイテム）を初期化しますか？')) {
       state = Engine.createInitialState();
       saveState();
       setActiveTab('map');

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Java Quest: MyKakeibo RPG — ゲームで学ぶJava全10回</title>
+  <title>Java Quest: MyKakeibo RPG — ゲームで学ぶJava全14回</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -13,7 +13,7 @@
         <div class="brand-badge">JAVA RPG</div>
         <div>
           <h1>Java Quest: MyKakeibo RPG</h1>
-          <p class="subtitle">全10回「家計簿Webアプリ」カリキュラム連動ゲーム</p>
+          <p class="subtitle">全14回「家計簿Webアプリ → DB・API・テスト・Spring Boot」連動ゲーム</p>
         </div>
       </div>
 
@@ -26,18 +26,23 @@
         </div>
         <div class="stat-pill">
           <span class="stat-label">総クリア</span>
-          <strong id="hud-cleared">0 / 10章</strong>
-          <small id="hud-stars">★ 0 / 30</small>
+          <strong id="hud-cleared">0 / 14章</strong>
+          <small id="hud-stars">★ 0 / 42</small>
         </div>
         <div class="stat-pill">
-          <span class="stat-label">コード修復</span>
-          <strong id="hud-quests">0 / 20</strong>
-          <small id="hud-accuracy">正答率 0%</small>
+          <span class="stat-label">修復・パズル</span>
+          <strong id="hud-quests">0 / 28</strong>
+          <small id="hud-puzzles">パズル 0 / 14</small>
+        </div>
+        <div class="stat-pill">
+          <span class="stat-label">戦績</span>
+          <strong id="hud-accuracy">正答率 0%</strong>
+          <small id="hud-combo">最大コンボ 0</small>
         </div>
         <div class="stat-pill">
           <span class="stat-label">コイン</span>
           <strong id="hud-coins">0 G</strong>
-          <small id="hud-combo">最大コンボ 0</small>
+          <small id="hud-items">🧪1 🔍1 🧿0</small>
         </div>
       </div>
 
@@ -51,7 +56,9 @@
 
     <nav class="nav-tabs" aria-label="ゲームメニュー">
       <button class="nav-tab active" data-view="map">🗺️ 冒険マップ</button>
-      <button class="nav-tab" data-view="quests">💻 コード修復クエスト</button>
+      <button class="nav-tab" data-view="quests">💻 コード修復</button>
+      <button class="nav-tab" data-view="puzzles">🧩 コード構築パズル</button>
+      <button class="nav-tab" data-view="shop">🛒 アイテムショップ</button>
       <button class="nav-tab" data-view="review">⚡ 弱点特訓 <span id="weak-count-badge" class="count-badge">0</span></button>
       <button class="nav-tab" data-view="survival">⏱️ ランダム10問試験</button>
       <button class="nav-tab" data-view="badges">🏆 図鑑・バッジ</button>

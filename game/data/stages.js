@@ -108,6 +108,19 @@
         "explanation": "`(int)(price * 1.1);` と書くことで double の結果を int に切り捨て変換し、文末に `;` を付けます。"
       }
     ],
+    "codePuzzle": {
+      "id": "p_01",
+      "title": "Javaプログラムの実行ステップ順",
+      "description": "最初のJavaプログラムを書いて画面に結果が出るまでの正しい手順順に並べ替えよう。",
+      "steps": [
+        "KakeiboStart.java ファイルを作成する",
+        "public class KakeiboStart の中に main メソッドを書く",
+        "javac KakeiboStart.java でバイトコードにコンパイルする",
+        "java KakeiboStart でプログラムを実行する"
+      ],
+      "hint": "まずソースファイルを書き、javac で翻訳してから java で実行します。",
+      "explanation": "Javaは「記述 → javac（コンパイル） → java（実行）」の流れで動きます。"
+    },
     "questions": [
       {
         "id": "L01_Q01",
@@ -351,6 +364,21 @@
         "explanation": "配列は `expenses.length`（カッコなし）、要素アクセスは `expenses[i]` です。"
       }
     ],
+    "codePuzzle": {
+      "id": "p_02",
+      "title": "配列の合計を計算するコード組み立て",
+      "description": "支出配列 `prices` の合計をループで計算して出力する正しい行順に並べよう。",
+      "steps": [
+        "int[] prices = {500, 1200, 800};",
+        "int sum = 0;",
+        "for (int i = 0; i < prices.length; i++) {",
+        "    sum += prices[i];",
+        "}",
+        "System.out.println(\"合計: \" + sum);"
+      ],
+      "hint": "配列と合計用変数を最初に用意し、for ループで加算してから最後に出力します。",
+      "explanation": "ループの前に `sum = 0` を初期化し、ループ終了後に結果を表示します。"
+    },
     "questions": [
       {
         "id": "L02_Q01",
@@ -594,6 +622,19 @@
         "explanation": "値を返すメソッドでは戻り値の型（`int`）を宣言し、`return` で結果を返します。"
       }
     ],
+    "codePuzzle": {
+      "id": "p_03",
+      "title": "カプセル化されたクラスの生成と利用",
+      "description": "`KakeiboItem` インスタンスを `new` し、価格を更新して取得する正しい流れに並べよう。",
+      "steps": [
+        "KakeiboItem item = new KakeiboItem(\"食費\", 800);",
+        "item.setPrice(950);",
+        "int current = item.getPrice();",
+        "System.out.println(current);"
+      ],
+      "hint": "まず new で実体を作り、setter で変更したあとに getter で値を取り出します。",
+      "explanation": "コンストラクタで初期化したインスタンスに対してメソッドを呼び出します。"
+    },
     "questions": [
       {
         "id": "L03_Q01",
@@ -837,6 +878,19 @@
         "explanation": "クラスの継承は `extends`、インターフェースの実装は `implements` を使います。"
       }
     ],
+    "codePuzzle": {
+      "id": "p_04",
+      "title": "CSV1行データのパース処理",
+      "description": "カンマ区切り文字列から金額を取り出し、2倍にして表示する正しい順に並べよう。",
+      "steps": [
+        "String line = \"ランチ,750\";",
+        "String[] cols = line.split(\",\");",
+        "int price = Integer.parseInt(cols[1]);",
+        "System.out.println(price * 2);"
+      ],
+      "hint": "split で配列に分解してから、2番目要素（cols[1]）を parseInt します。",
+      "explanation": "文字列のままでは掛け算できないため、split → parseInt → 計算の順に行います。"
+    },
     "questions": [
       {
         "id": "L04_Q01",
@@ -1080,6 +1134,22 @@
         "explanation": "`ArrayList` は `list.add(...)` で末尾に追加し、`list.size()` で要素数を取得します。"
       }
     ],
+    "codePuzzle": {
+      "id": "p_05",
+      "title": "安全な数値入力とリスト追加（try-catch）",
+      "description": "文字列を数値に変換し、失敗しても落ちずに `ArrayList` へ登録するコード順を組み立てよう。",
+      "steps": [
+        "ArrayList<Integer> list = new ArrayList<>();",
+        "try {",
+        "    int val = Integer.parseInt(input);",
+        "    list.add(val);",
+        "} catch (NumberFormatException e) {",
+        "    System.out.println(\"数値エラー\");",
+        "}"
+      ],
+      "hint": "リストを準備し、try の中で変換と追加、catch でエラー処理を書きます。",
+      "explanation": "変換成功時だけ `list.add(val)` が実行され、不正入力時は `catch` に移ります。"
+    },
     "questions": [
       {
         "id": "L05_Q01",
@@ -1323,6 +1393,19 @@
         "explanation": "`res.getWriter()` で `PrintWriter` を取得し、`out.println(...)` でHTMLを返します。"
       }
     ],
+    "codePuzzle": {
+      "id": "p_06",
+      "title": "ServletがHTMLレスポンスを返す流れ",
+      "description": "`doGet` メソッド内で文字コード設定からHTML出力までの正しいコード順に並べよう。",
+      "steps": [
+        "res.setContentType(\"text/html; charset=UTF-8\");",
+        "PrintWriter out = res.getWriter();",
+        "out.println(\"<h1>MyKakeibo</h1>\");",
+        "out.println(\"<p>起動成功！</p>\");"
+      ],
+      "hint": "必ず getWriter() を呼ぶ前に setContentType で UTF-8 を指定します。",
+      "explanation": "`setContentType` を `getWriter()` の前に書かないと文字化けの原因になります。"
+    },
     "questions": [
       {
         "id": "L06_Q01",
@@ -1566,6 +1649,19 @@
         "explanation": "`req.setCharacterEncoding(\"UTF-8\")` のあとに `req.getParameter(\"項目名\")` を呼びます。"
       }
     ],
+    "codePuzzle": {
+      "id": "p_07",
+      "title": "POSTフォームデータの安全な受信手順",
+      "description": "`doPost` で日本語の品名と金額を受け取る正しい順番を組み立てよう。",
+      "steps": [
+        "req.setCharacterEncoding(\"UTF-8\");",
+        "String title = req.getParameter(\"title\");",
+        "String priceStr = req.getParameter(\"price\");",
+        "int price = Integer.parseInt(priceStr);"
+      ],
+      "hint": "一番最初にリクエストの文字コード設定を行い、そのあとパラメータを取り出して数値変換します。",
+      "explanation": "`getParameter` より前に `setCharacterEncoding(\"UTF-8\")` を実行するのが鉄則です。"
+    },
     "questions": [
       {
         "id": "L07_Q01",
@@ -1809,6 +1905,19 @@
         "explanation": "`(ArrayList<KakeiboItem>) request.getAttribute(\"items\")` で安全に元の型に戻せます。"
       }
     ],
+    "codePuzzle": {
+      "id": "p_08",
+      "title": "MVCコントローラのフォワード処理",
+      "description": "データをリクエストスコープに預けて JSP へ画面表示を引き継ぐ正しい順に並べよう。",
+      "steps": [
+        "ArrayList<KakeiboItem> list = createSampleList();",
+        "req.setAttribute(\"items\", list);",
+        "RequestDispatcher rd = req.getRequestDispatcher(\"/WEB-INF/app.jsp\");",
+        "rd.forward(req, res);"
+      ],
+      "hint": "リスト準備 → スコープに格納 → Dispatcher取得 → forward実行 の順です。",
+      "explanation": "`forward` 後はレスポンスがJSPに移るため、その前に `setAttribute` を完了させます。"
+    },
     "questions": [
       {
         "id": "L08_Q01",
@@ -2032,6 +2141,18 @@
         "explanation": "CSV形式では各フィールドをカンマ `,` で連結して1行の文字列として保存します。"
       }
     ],
+    "codePuzzle": {
+      "id": "p_09",
+      "title": "DAO永続化とPRGパターンによる登録処理",
+      "description": "新規明細を保存し、リロード二重送信を防ぐPRGリダイレクトまでの順に並べよう。",
+      "steps": [
+        "KakeiboItem item = new KakeiboItem(date, type, cat, title, price);",
+        "dao.insert(item);",
+        "res.sendRedirect(req.getContextPath() + \"/app\");"
+      ],
+      "hint": "モデル生成 → DAOで保存 → sendRedirect でGET画面へ飛ばす、の3ステップです。",
+      "explanation": "POST処理でDBやCSVに保存したあと `sendRedirect` するのが PRG パターンです。"
+    },
     "questions": [
       {
         "id": "L09_Q01",
@@ -2178,9 +2299,9 @@
   {
     "id": 10,
     "lessonFile": "../lesson10.md",
-    "title": "第10章：MyKakeibo魔王城（最終決戦）",
+    "title": "第10章：MyKakeibo魔王城（Web基礎完成）",
     "subtitle": "絞り込み検索 / バリデーション / XSS対策 / アプリ完成",
-    "areaName": "完成版MyKakeibo魔王城",
+    "areaName": "基礎完成・MyKakeibo城",
     "story": "ついに最終決戦！検索機能・サーバー側バリデーション・XSS対策を施し、全10回の知識を結集して「MyKakeibo Webアプリ」を完成させよう！",
     "monster": {
       "name": "脆弱性魔王・バグキング",
@@ -2275,6 +2396,19 @@
         "explanation": "`price <= 0` で0以下を弾き、`contains(keyword)` で品名への部分一致を判定します。"
       }
     ],
+    "codePuzzle": {
+      "id": "p_10",
+      "title": "バリデーション＆検索フィルタの実行順",
+      "description": "入力金額をチェックし、エラーがなければリストを検索して画面へ渡す流れを組み立てよう。",
+      "steps": [
+        "if (price <= 0) { errors.add(\"1円以上を入力\"); }",
+        "String safeTitle = escapeHtml(title);",
+        "ArrayList<KakeiboItem> filtered = dao.search(keyword);",
+        "req.setAttribute(\"items\", filtered);"
+      ],
+      "hint": "入力検証 → XSSエスケープ → 検索実行 → 結果をスコープへ格納、の順です。",
+      "explanation": "検証と無害化を済ませてから安全なデータを扱い、Viewへ渡します。"
+    },
     "questions": [
       {
         "id": "L10_Q01",
@@ -2415,6 +2549,1035 @@
         },
         "answer": "A",
         "explanation": "Servlet/JSPとMVC・DAOの基礎を自分の手で書いた経験があると、Spring Bootなどの最新フレームワークを学んだときに「なぜこう書くのか」が驚くほど深く理解できます！"
+      }
+    ]
+  },
+  {
+    "id": 11,
+    "lessonFile": "../lesson11.md",
+    "title": "第11章：SQLとJDBCの地下データベース",
+    "subtitle": "SQLite / JDBC / PreparedStatement / SQLインジェクション対策",
+    "areaName": "リレーショナル地下神殿",
+    "story": "CSV保存の限界を超えろ！SQLとJDBCの力を手に入れ、`PreparedStatement` でSQLインジェクションを封じながらSQLiteデータベースへ進化させよう。",
+    "monster": {
+      "name": "SQLインジェクション・ワーム",
+      "title": "文字列連結SQLを狙う寄生虫",
+      "emoji": "🪱",
+      "color": "#14b8a6",
+      "maxHp": 150,
+      "intro": "「`WHERE title = '` + 入力値 でSQLを書けば、`OR '1'='1` で全データを奪ってやるぞ！」",
+      "defeat": "「`?` プレースホルダと `try-with-resources` …完全に防がれたか！」"
+    },
+    "badge": {
+      "id": "badge_11",
+      "name": "JDBC守護者の石板",
+      "icon": "🗄️"
+    },
+    "tips": [
+      {
+        "title": "SQLのCRUD 4命令",
+        "code": "SELECT * FROM kakeibo_items WHERE category = ?;\nINSERT INTO kakeibo_items (title, price) VALUES (?, ?);\nUPDATE kakeibo_items SET price = ? WHERE id = ?;\nDELETE FROM kakeibo_items WHERE id = ?;",
+        "note": "UPDATEとDELETEには必ず WHERE を付ける！"
+      },
+      {
+        "title": "PreparedStatementとtry-with-resources",
+        "code": "try (Connection conn = DriverManager.getConnection(url);\n     PreparedStatement ps = conn.prepareStatement(sql)) {\n    ps.setString(1, category);\n    ResultSet rs = ps.executeQuery();\n}",
+        "note": "プレースホルダ `?` の番号は 1 から始まる。"
+      },
+      {
+        "title": "executeQuery と executeUpdate",
+        "code": "ResultSet rs = ps.executeQuery();   // SELECT用\nint rows = ps.executeUpdate();    // INSERT/UPDATE/DELETE用",
+        "note": "検索は executeQuery()、更新系は executeUpdate() を使い分ける。"
+      }
+    ],
+    "codingQuests": [
+      {
+        "id": "q_11_1",
+        "title": "SQLインジェクションを防ぐ PreparedStatement",
+        "description": "品名 `title` と金額 `price` を安全に `INSERT` する JDBC コードを完成させよう。",
+        "codeTemplate": "String sql = \"INSERT INTO kakeibo_items (title, price) VALUES ([1], ?)\";\ntry (Connection conn = DriverManager.getConnection(dbUrl);\n     PreparedStatement ps = conn.prepareStatement(sql)) {\n    ps.setString(1, title);\n    ps.setInt(2, price);\n    ps.[2]();\n}",
+        "blanks": [
+          {
+            "label": "[1]",
+            "options": [
+              "?",
+              "$1",
+              ":title",
+              "%s"
+            ],
+            "answer": "?"
+          },
+          {
+            "label": "[2]",
+            "options": [
+              "executeUpdate",
+              "executeQuery",
+              "runSql",
+              "commitQuery"
+            ],
+            "answer": "executeUpdate"
+          }
+        ],
+        "hint": "JDBCのプレースホルダ記号と、INSERT/UPDATE/DELETE用の実行メソッドを選びます。",
+        "explanation": "JDBCでは `?` をプレースホルダに使い、更新系SQLは `ps.executeUpdate()` で実行します。"
+      },
+      {
+        "id": "q_11_2",
+        "title": "ResultSet からデータを1行ずつ取り出す",
+        "description": "`SELECT` の結果セットから全件をループで読み取るコードを完成させよう。",
+        "codeTemplate": "while (rs.[1]()) {\n    int id = rs.[2](\"id\");\n    String title = rs.getString(\"title\");\n}",
+        "blanks": [
+          {
+            "label": "[1]",
+            "options": [
+              "next",
+              "hasNext",
+              "read",
+              "move"
+            ],
+            "answer": "next"
+          },
+          {
+            "label": "[2]",
+            "options": [
+              "getInt",
+              "getInteger",
+              "readInt",
+              "intValue"
+            ],
+            "answer": "getInt"
+          }
+        ],
+        "hint": "ResultSet のカーソルを1行進めるメソッドと、整数列を取り出すメソッドです。",
+        "explanation": "`while (rs.next())` で行を進め、`rs.getInt(\"列名\")` で整数値を取得します。"
+      }
+    ],
+    "codePuzzle": {
+      "id": "p_11",
+      "title": "JDBCによる安全なSELECT検索手順",
+      "description": "`PreparedStatement` を使ってデータベースから検索結果を取り出す正しいコード順に並べよう。",
+      "steps": [
+        "String sql = \"SELECT id, title, price FROM kakeibo_items WHERE category = ?\";",
+        "PreparedStatement ps = conn.prepareStatement(sql);",
+        "ps.setString(1, \"食費\");",
+        "ResultSet rs = ps.executeQuery();",
+        "while (rs.next()) { System.out.println(rs.getString(\"title\")); }"
+      ],
+      "hint": "SQL文字列を用意 → prepareStatement → `?` に値をセット → executeQuery → rs.next() で読み取り。",
+      "explanation": "必ず `executeQuery()` を呼ぶ前に `ps.setString(1, ...)` でパラメータを設定します。"
+    },
+    "questions": [
+      {
+        "id": "L11_Q01",
+        "no": 1,
+        "topic": "SQLの基本操作CRUD",
+        "prompt": "データベースの4大基本操作「CRUD」において、データの「取得（検索）」と「更新」に対応するSQL命令の組み合わせはどれですか？",
+        "choices": {
+          "A": "取得：`GET` ／ 更新：`CHANGE`",
+          "B": "取得：`SELECT` ／ 更新：`UPDATE`",
+          "C": "取得：`FIND` ／ 更新：`MODIFY`",
+          "D": "取得：`READ` ／ 更新：`ALTER`"
+        },
+        "answer": "B",
+        "explanation": "CRUD は Create=`INSERT`, Read=`SELECT`, Update=`UPDATE`, Delete=`DELETE` です。"
+      },
+      {
+        "id": "L11_Q02",
+        "no": 2,
+        "topic": "WHERE句の役割",
+        "prompt": "`DELETE FROM kakeibo_items;` のように `WHERE` 句を付けずに `DELETE` 文を実行するとどうなりますか？",
+        "choices": {
+          "A": "1件も削除されない",
+          "B": "最新の1件だけが削除される",
+          "C": "テーブル内の全データが削除されてしまう",
+          "D": "コンパイルエラーになる"
+        },
+        "answer": "C",
+        "explanation": "`WHERE` 句を忘れるとテーブルの全行が削除されるため、`DELETE` / `UPDATE` 時は必ず条件を確認します。"
+      },
+      {
+        "id": "L11_Q03",
+        "no": 3,
+        "topic": "JDBCの接続とリソース管理",
+        "prompt": "JDBCで取得した `Connection`、`PreparedStatement`、`ResultSet` を使い終わったあとに必ず自動的に `close()` するためのJava構文はどれですか？",
+        "choices": {
+          "A": "`try-with-resources`（`try (Connection conn = ...) { ... }`）",
+          "B": "`switch-case`",
+          "C": "`do-while`",
+          "D": "`implements Closeable`"
+        },
+        "answer": "A",
+        "explanation": "`try (...)` の丸カッコ内で開いた `Connection` 等は、ブロック終了時に自動で `close()` されます。"
+      },
+      {
+        "id": "L11_Q04",
+        "no": 4,
+        "topic": "executeQuery と executeUpdate の使い分け",
+        "prompt": "`SELECT` 文を実行するときに使うメソッドと、`INSERT` / `UPDATE` / `DELETE` 文を実行するときに使うメソッドの正しい組み合わせはどれですか？",
+        "choices": {
+          "A": "SELECT：`executeUpdate()` ／ INSERT等：`executeQuery()`",
+          "B": "SELECT：`executeQuery()` ／ INSERT等：`executeUpdate()`",
+          "C": "どちらも `runSql()` を使う",
+          "D": "どちらも `printSql()` を使う"
+        },
+        "answer": "B",
+        "explanation": "結果を返す `SELECT` は `executeQuery()`、件数を更新する `INSERT`/`UPDATE`/`DELETE` は `executeUpdate()` を使います。"
+      },
+      {
+        "id": "L11_Q05",
+        "no": 5,
+        "topic": "SQLインジェクション対策",
+        "prompt": "Webフォームから受け取った検索文字をSQL文に安全に埋め込むための正しい方法はどれですか？",
+        "choices": {
+          "A": "`String sql = \"SELECT * FROM kakeibo_items WHERE title = '\" + title + \"'\";` と文字列連結する",
+          "B": "`PreparedStatement` の `?`（プレースホルダ）を使い、`ps.setString(1, title)` で値をセットする",
+          "C": "HTMLのフォームを `method=\"get\"` にする",
+          "D": "CSSで入力欄を隠す"
+        },
+        "answer": "B",
+        "explanation": "`PreparedStatement` の `?` プレースホルダを使うことで、SQLインジェクション攻撃を根本から防げます。"
+      },
+      {
+        "id": "L11_Q06",
+        "no": 6,
+        "topic": "ResultSetの読み取り",
+        "prompt": "`ResultSet rs = ps.executeQuery();` で取得した結果表から、1行ずつデータを取り出しながら最後までループする正しい書き方はどれですか？",
+        "choices": {
+          "A": "`while (rs.next()) { ... }`",
+          "B": "`for (int i = 0; i < rs.length; i++) { ... }`",
+          "C": "`if (rs.hasMore()) { ... }`",
+          "D": "`while (rs.readLine()) { ... }`"
+        },
+        "answer": "A",
+        "explanation": "`rs.next()` は次の行へカーソルを進め、データがあれば `true`、終わりに達したら `false` を返します。"
+      },
+      {
+        "id": "L11_Q07",
+        "no": 7,
+        "topic": "プレースホルダの番号",
+        "prompt": "`INSERT INTO kakeibo_items (title, price) VALUES (?, ?)` において、2番目の `?` に整数変数 `amount` を設定する正しいコードはどれですか？",
+        "choices": {
+          "A": "`ps.setInt(1, amount);`",
+          "B": "`ps.setInt(2, amount);`",
+          "C": "`ps.setString(2, amount);`",
+          "D": "`ps.addParam(\"price\", amount);`"
+        },
+        "answer": "B",
+        "explanation": "JDBCのプレースホルダ番号は `0` ではなく **`1` から**始まります。2番目は `ps.setInt(2, amount)` です。"
+      },
+      {
+        "id": "L11_Q08",
+        "no": 8,
+        "topic": "DAOパターンの利点",
+        "prompt": "保存先をCSVファイル（`KakeiboDAO`）からSQLiteデータベース（`KakeiboJdbcDAO`）へ切り替える際、DAOパターンで設計しておくとどのようなメリットがありますか？",
+        "choices": {
+          "A": "データアクセス処理がDAOに分離されているため、JSPやServletの画面・制御ロジックへの修正を最小限に抑えられる",
+          "B": "HTMLタグを書かなくてよくなる",
+          "C": "Javaのコンパイルが不要になる",
+          "D": "JavaScriptを使わずにCSSだけでDB接続できる"
+        },
+        "answer": "A",
+        "explanation": "データ永続化の仕組みをDAOに閉じ込める（疎結合にする）ことで、保守性・拡張性が大きく向上します。"
+      },
+      {
+        "id": "L11_Q09",
+        "no": 9,
+        "topic": "主キーとAUTO INCREMENT",
+        "prompt": "テーブル定義で `id INTEGER PRIMARY KEY AUTOINCREMENT` と指定すると、`INSERT` 時にどうなりますか？",
+        "choices": {
+          "A": "毎回プログラム側でランダムな文字を作る必要がある",
+          "B": "データベースが重複しない連番の `id` を自動的に採番してくれる",
+          "C": "`id` がすべて `0` になる",
+          "D": "1件しか登録できなくなる"
+        },
+        "answer": "B",
+        "explanation": "主キー（PRIMARY KEY）に自動採番を設定すると、一意の番号をDB側が安全に割り当てます。"
+      },
+      {
+        "id": "L11_Q10",
+        "no": 10,
+        "topic": "トランザクションの意味",
+        "prompt": "銀行の振込処理のように「出金と入金をセットで行い、片方が失敗したら両方取り消す」仕組みをデータベース用語で何と呼びますか？",
+        "choices": {
+          "A": "トランザクション管理（`commit` / `rollback`）",
+          "B": "カプセル化",
+          "C": "キャスト変換",
+          "D": "ポリモーフィズム"
+        },
+        "answer": "A",
+        "explanation": "複数の処理を「すべて成功（`commit`）」か「すべて取り消し（`rollback`）」にまとめる仕組みがトランザクションです。"
+      }
+    ]
+  },
+  {
+    "id": 12,
+    "lessonFile": "../lesson12.md",
+    "title": "第12章：HashMap・Stream・JSON APIの通信塔",
+    "subtitle": "HashMap / ラムダ式 / Stream API / JSON & fetch()",
+    "areaName": "非同期JSON通信塔",
+    "story": "`HashMap` で費目別合計を一瞬で集計し、Stream API でリストを自在に加工！さらに JSON を返す REST API でブラウザと非同期通信しよう。",
+    "monster": {
+      "name": "同期ブロッキング・サイクロプス",
+      "title": "毎回ページ全体を再読込させる単眼巨人",
+      "emoji": "👁️",
+      "color": "#8b5cf6",
+      "maxHp": 150,
+      "intro": "「HTML丸ごと再生成しか知らぬ者よ、JSONとStreamの洗練された力に耐えられるか！」",
+      "defeat": "「`HashMap` と `stream().filter().mapToInt().sum()` …完璧なデータ処理だ！」"
+    },
+    "badge": {
+      "id": "badge_12",
+      "name": "Stream通信の宝珠",
+      "icon": "📡"
+    },
+    "tips": [
+      {
+        "title": "HashMap で費目別集計",
+        "code": "Map<String, Integer> totals = new HashMap<>();\ntotals.put(cat, totals.getOrDefault(cat, 0) + price);",
+        "note": "getOrDefault(key, 0) を使うと初回登録時の null チェックが不要になる。"
+      },
+      {
+        "title": "Stream API で1行集計",
+        "code": "int sum = items.stream()\n    .filter(i -> \"支出\".equals(i.getType()))\n    .mapToInt(KakeiboItem::getPrice)\n    .sum();",
+        "note": "filter → mapToInt → sum のパイプラインでループを簡潔に書ける。"
+      },
+      {
+        "title": "JSONレスポンス",
+        "code": "res.setContentType(\"application/json; charset=UTF-8\");\nres.getWriter().printf(\"{\\\"balance\\\": %d}\", balance);",
+        "note": "JSONキーと文字列は必ずダブルクォート \" で囲む。"
+      }
+    ],
+    "codingQuests": [
+      {
+        "id": "q_12_1",
+        "title": "Stream API で支出合計を1文で計算せよ",
+        "description": "`items` から `\"支出\"` だけを抜き出し、金額の合計を計算する Stream を完成させよう。",
+        "codeTemplate": "int total = items.stream()\n    .[1](i -> \"支出\".equals(i.getType()))\n    .mapToInt(KakeiboItem::getPrice)\n    .[2]();",
+        "blanks": [
+          {
+            "label": "[1]",
+            "options": [
+              "filter",
+              "where",
+              "select",
+              "find"
+            ],
+            "answer": "filter"
+          },
+          {
+            "label": "[2]",
+            "options": [
+              "sum",
+              "total",
+              "addAll",
+              "count"
+            ],
+            "answer": "sum"
+          }
+        ],
+        "hint": "条件で絞り込む中間操作と、intストリームを合計する終端操作を選びます。",
+        "explanation": "`filter(...)` で要素を絞り込み、`mapToInt(...)` のあとに `.sum()` で合計を求めます。"
+      },
+      {
+        "id": "q_12_2",
+        "title": "HashMap の getOrDefault と JSON Content-Type",
+        "description": "費目別マップに安全に加算する処理と、JSONを返すレスポンス設定を完成させよう。",
+        "codeTemplate": "int prev = map.[1](cat, 0);\nmap.put(cat, prev + price);\nres.setContentType(\"[2]; charset=UTF-8\");",
+        "blanks": [
+          {
+            "label": "[1]",
+            "options": [
+              "getOrDefault",
+              "getOrZero",
+              "fetch",
+              "find"
+            ],
+            "answer": "getOrDefault"
+          },
+          {
+            "label": "[2]",
+            "options": [
+              "application/json",
+              "text/json",
+              "application/javascript",
+              "text/html"
+            ],
+            "answer": "application/json"
+          }
+        ],
+        "hint": "キーが無いときに既定値を返す Map メソッドと、JSONの正式な MIME タイプを選びます。",
+        "explanation": "`getOrDefault(cat, 0)` で null を防ぎ、JSON API の MIME タイプは `application/json` です。"
+      }
+    ],
+    "codePuzzle": {
+      "id": "p_12",
+      "title": "JSON API サーブレットのレスポンス組み立て",
+      "description": "`HashMap` で集計した結果を JSON としてブラウザへ返す正しい順に並べよう。",
+      "steps": [
+        "res.setContentType(\"application/json; charset=UTF-8\");",
+        "int expense = items.stream().mapToInt(KakeiboItem::getPrice).sum();",
+        "String json = \"{\\\"expense\\\": \" + expense + \"}\";",
+        "res.getWriter().println(json);"
+      ],
+      "hint": "Content-Type を設定し、Stream で集計して JSON文字列を作り、PrintWriter で書き出します。",
+      "explanation": "JSON出力前に `application/json` を設定し、集計値をJSON形式にして送信します。"
+    },
+    "questions": [
+      {
+        "id": "L12_Q01",
+        "no": 1,
+        "topic": "HashMapの特徴",
+        "prompt": "`ArrayList` と比較したときの `HashMap<String, Integer>` の特徴として最も適切なものはどれですか？",
+        "choices": {
+          "A": "「`\"食費\"` → `1500`」のように「キー（名前）」と「値」のペアでデータを管理し、キーを指定して高速に取り出せる",
+          "B": "数値の添字 `[0]` でしかアクセスできない",
+          "C": "同じキーで何度も値を保存すると値が自動的に足し算される",
+          "D": "HTMLファイルの中でしか使えない"
+        },
+        "answer": "A",
+        "explanation": "`HashMap` はキーと値（Key-Value）の対応でデータを管理し、費目別の集計などで大活躍します。"
+      },
+      {
+        "id": "L12_Q02",
+        "no": 2,
+        "topic": "getOrDefaultの役割",
+        "prompt": "`int cur = map.getOrDefault(\"食費\", 0);` を実行したとき、マップに `\"食費\"` というキーがまだ存在しない場合、`cur` には何が入りますか？",
+        "choices": {
+          "A": "`null`（NullPointerExceptionになる）",
+          "B": "`0`",
+          "C": "`-1`",
+          "D": "エラーで止まる"
+        },
+        "answer": "B",
+        "explanation": "`getOrDefault(key, defaultValue)` はキーが存在しない場合に第2引数の既定値（ここでは `0`）を返します。"
+      },
+      {
+        "id": "L12_Q03",
+        "no": 3,
+        "topic": "HashSetの特徴",
+        "prompt": "登録されている費目名の一覧から「重複を除いた一意な費目リスト」を作りたいとき、重複を自動的に排除してくれるコレクションはどれですか？",
+        "choices": {
+          "A": "`ArrayList<String>`",
+          "B": "`HashSet<String>`",
+          "C": "`int[]`",
+          "D": "`Scanner`"
+        },
+        "answer": "B",
+        "explanation": "`Set`（`HashSet`）は要素の重複を許さないコレクションです。"
+      },
+      {
+        "id": "L12_Q04",
+        "no": 4,
+        "topic": "Stream APIのfilter",
+        "prompt": "`items.stream().filter(i -> i.getPrice() >= 1000)` の `filter` が行っている処理はどれですか？",
+        "choices": {
+          "A": "金額をすべて1000に変更する",
+          "B": "金額が1000以上の要素だけを抽出して次の処理へ流す",
+          "C": "リストを逆順に並べ替える",
+          "D": "リストから要素を完全に削除して空にする"
+        },
+        "answer": "B",
+        "explanation": "`filter` は条件式が `true` になる要素だけを通過させ、元のリスト自体は破壊しません。"
+      },
+      {
+        "id": "L12_Q05",
+        "no": 5,
+        "topic": "メソッド参照とラムダ式",
+        "prompt": "`item -> item.getPrice()` と同じ意味になるJavaの「メソッド参照」の書き方はどれですか？",
+        "choices": {
+          "A": "`KakeiboItem::getPrice`",
+          "B": "`KakeiboItem->getPrice`",
+          "C": "`KakeiboItem.getPrice()`",
+          "D": "`@KakeiboItem.getPrice`"
+        },
+        "answer": "A",
+        "explanation": "`クラス名::メソッド名` と書くことで、簡潔なメソッド参照が書けます。"
+      },
+      {
+        "id": "L12_Q06",
+        "no": 6,
+        "topic": "JSONの基本形式",
+        "prompt": "REST API でよく使われる JSON 形式として**正しい構文**はどれですか？",
+        "choices": {
+          "A": "`{'income': 5000, 'expense': 1200}`（シングルクォート）",
+          "B": "`{\"income\": 5000, \"expense\": 1200}`（キーと文字列をダブルクォートで囲む）",
+          "C": "`<income>5000</income>`",
+          "D": "`income=5000; expense=1200;`"
+        },
+        "answer": "B",
+        "explanation": "JSON仕様ではキー名も文字列値も必ずダブルクォート `\"` で囲みます。"
+      },
+      {
+        "id": "L12_Q07",
+        "no": 7,
+        "topic": "Content-Typeの設定",
+        "prompt": "ServletからHTMLではなくJSONデータを返すとき、`res.setContentType(...)` に指定する正しいMIMEタイプはどれですか？",
+        "choices": {
+          "A": "`\"text/html; charset=UTF-8\"`",
+          "B": "`\"application/json; charset=UTF-8\"`",
+          "C": "`\"text/csv; charset=UTF-8\"`",
+          "D": "`\"image/png\"`"
+        },
+        "answer": "B",
+        "explanation": "JSONレスポンスには `application/json; charset=UTF-8` を指定します。"
+      },
+      {
+        "id": "L12_Q08",
+        "no": 8,
+        "topic": "ブラウザ側のfetch API",
+        "prompt": "JavaScript の `fetch(\"api/summary\")` を使ってサーバーと非同期通信する最大のメリットは何ですか？",
+        "choices": {
+          "A": "ページ全体を再読み込み（画面遷移）せずに、画面の一部のデータやグラフだけを滑らかに更新できる",
+          "B": "Javaサーバーを起動しなくてもデータベースが動くようになる",
+          "C": "SQLインジェクションが自動で見つかる",
+          "D": "CSSファイルが不要になる"
+        },
+        "answer": "A",
+        "explanation": "`fetch()` による非同期通信（SPA/Ajax的更新）により、ページ再読み込みなしの快適なUIが作れます。"
+      },
+      {
+        "id": "L12_Q09",
+        "no": 9,
+        "topic": "Optional と orElse",
+        "prompt": "`items.stream().mapToInt(KakeiboItem::getPrice).average().orElse(0.0)` で最後の `.orElse(0.0)` を付ける理由は何ですか？",
+        "choices": {
+          "A": "リストが0件だった場合に「値なし」でエラーになるのを防ぎ、既定値 `0.0` を受け取るため",
+          "B": "平均値を必ず0にするため",
+          "C": "整数に変換するため",
+          "D": "例外を強制発生させるため"
+        },
+        "answer": "A",
+        "explanation": "`average()` は結果が空かもしれないため `OptionalDouble` を返します。`.orElse(0.0)` で安全に取り出せます。"
+      },
+      {
+        "id": "L12_Q10",
+        "no": 10,
+        "topic": "RESTfulなHTTPメソッド",
+        "prompt": "Web APIの設計において、データの「取得」「新規作成」「更新」「削除」にそれぞれ対応するHTTPメソッドの組み合わせとして一般的なものはどれですか？",
+        "choices": {
+          "A": "取得：`GET` ／ 新規作成：`POST` ／ 更新：`PUT`（または`PATCH`） ／ 削除：`DELETE`",
+          "B": "すべて `GET` だけを使う",
+          "C": "取得：`DELETE` ／ 削除：`GET`",
+          "D": "更新：`PRINT` ／ 作成：`CLASS`"
+        },
+        "answer": "A",
+        "explanation": "HTTPメソッドの意味（GET/POST/PUT/DELETE）をCRUD操作に対応させるのがREST APIの基本設計です。"
+      }
+    ]
+  },
+  {
+    "id": 13,
+    "lessonFile": "../lesson13.md",
+    "title": "第13章：JUnit単体テストと品質保証の砦",
+    "subtitle": "JUnit 5 / @Test / assertThrows / 境界値テスト / スタックトレース",
+    "areaName": "品質保証のテスト砦",
+    "story": "アプリが大きくなるほどデグレード（先祖返りバグ）の恐怖が迫る！JUnit 5 自動テストの鎧をまとい、どんな変更にも耐える品質を手に入れよう。",
+    "monster": {
+      "name": "デグレード・キメラ",
+      "title": "修正のたびに別機能を壊す混沌の魔獣",
+      "emoji": "🧪",
+      "color": "#ef4444",
+      "maxHp": 160,
+      "intro": "「手作業のテストなどどうせ忘れる！1箇所直せば別のバグを生んでやるぞ！」",
+      "defeat": "「`@Test` と `assertThrows`、さらに境界値テストまで…完全な自動防衛網だ！」"
+    },
+    "badge": {
+      "id": "badge_13",
+      "name": "JUnit品質の盾",
+      "icon": "🧪"
+    },
+    "tips": [
+      {
+        "title": "JUnit 5 の基本形（AAAパターン）",
+        "code": "@Test\nvoid testCalcBalance() {\n    // Arrange & Act & Assert\n    assertEquals(1500, calcBalance(3000, 1500));\n}",
+        "note": "assertEquals(期待値, 実際の値) の順で渡す。"
+      },
+      {
+        "title": "例外スローの検証",
+        "code": "assertThrows(IllegalArgumentException.class, () -> {\n    item.setPrice(-100);\n});",
+        "note": "異常系は assertThrows で「意図通りエラーになること」を自動検証する。"
+      },
+      {
+        "title": "境界値テストとスタックトレース",
+        "code": "// 1円以上が正常なら、境界の 0 と 1 を必ずテスト！",
+        "note": "スタックトレースは1行目の例外名と、自分のクラス名・行番号から追う。"
+      }
+    ],
+    "codingQuests": [
+      {
+        "id": "q_13_1",
+        "title": "JUnit 5 で正常系・異常系テストを実装せよ",
+        "description": "残高計算が一致することと、マイナス金額で例外が飛ぶことを検証するテストを完成させよう。",
+        "codeTemplate": "[1]\nvoid testPriceValidation() {\n    [2](IllegalArgumentException.class, () -> {\n        new KakeiboItem(\"食費\", -1);\n    });\n}",
+        "blanks": [
+          {
+            "label": "[1]",
+            "options": [
+              "@Test",
+              "@Run",
+              "@Before",
+              "@Check"
+            ],
+            "answer": "@Test"
+          },
+          {
+            "label": "[2]",
+            "options": [
+              "assertThrows",
+              "assertEquals",
+              "assertTrue",
+              "expectError"
+            ],
+            "answer": "assertThrows"
+          }
+        ],
+        "hint": "テストメソッドを表すアノテーションと、例外発生を検証するアサーションメソッドを選びます。",
+        "explanation": "`@Test` でテストを宣言し、`assertThrows(例外.class, () -> ...)` で例外発生を検証します。"
+      },
+      {
+        "id": "q_13_2",
+        "title": "不正金額を弾く防御的メソッド",
+        "description": "0円以下が渡されたときに `IllegalArgumentException` を投げるセッターを完成させよう。",
+        "codeTemplate": "public void setPrice(int price) {\n    if (price <= 0) {\n        [1] new [2](\"1円以上を指定してください\");\n    }\n    this.price = price;\n}",
+        "blanks": [
+          {
+            "label": "[1]",
+            "options": [
+              "throw",
+              "throws",
+              "return",
+              "catch"
+            ],
+            "answer": "throw"
+          },
+          {
+            "label": "[2]",
+            "options": [
+              "IllegalArgumentException",
+              "NullPointerException",
+              "IOException",
+              "ExceptionBase"
+            ],
+            "answer": "IllegalArgumentException"
+          }
+        ],
+        "hint": "メソッド内部で例外インスタンスを発生させるキーワードと、引数不正を表す標準例外クラスです。",
+        "explanation": "`throw new IllegalArgumentException(...)` で不正な引数を即座に検出できます（メソッド宣言は `throws`、送出は `throw`）。"
+      }
+    ],
+    "codePuzzle": {
+      "id": "p_13",
+      "title": "JUnit テストケースの AAA パターン構築",
+      "description": "`@BeforeEach` の準備から `@Test` の AAA（Arrange → Act → Assert）までの正しい順に並べよう。",
+      "steps": [
+        "@BeforeEach void setUp() { list = new ArrayList<>(); }",
+        "@Test void testAddItem() {",
+        "    KakeiboItem item = new KakeiboItem(\"食費\", 500);",
+        "    list.add(item);",
+        "    assertEquals(1, list.size());",
+        "}"
+      ],
+      "hint": "@BeforeEach で初期化 → @Test 開始 → Arrange(生成) → Act(追加) → Assert(件数検証) → 閉じカッコ。",
+      "explanation": "テストの前準備を `@BeforeEach` に置き、テスト本体を準備・実行・検証の順で書きます。"
+    },
+    "questions": [
+      {
+        "id": "L13_Q01",
+        "no": 1,
+        "topic": "単体テストの目的",
+        "prompt": "JUnitなどを使って自動化された「単体テスト（Unit Test）」を書く最大のメリットは何ですか？",
+        "choices": {
+          "A": "コードを修正・機能追加したあとも、既存のロジックが壊れていないかを1コマンドで瞬時に確認できる",
+          "B": "HTMLの見た目が自動で綺麗になる",
+          "C": "データベースが不要になる",
+          "D": "Javaファイルが自動的にPythonへ変換される"
+        },
+        "answer": "A",
+        "explanation": "自動テスト（回帰テスト）があることで、安心して機能追加やコード改善ができます。"
+      },
+      {
+        "id": "L13_Q02",
+        "no": 2,
+        "topic": "JUnitのテストメソッド指定",
+        "prompt": "JUnit 5 で「このメソッドをテストケースとして実行してほしい」と目印を付けるアノテーションはどれですか？",
+        "choices": {
+          "A": "`@Run`",
+          "B": "`@Test`",
+          "C": "`@Check`",
+          "D": "`@Assert`"
+        },
+        "answer": "B",
+        "explanation": "JUnitではテスト対象メソッドに `@Test` アノテーションを付けます。"
+      },
+      {
+        "id": "L13_Q03",
+        "no": 3,
+        "topic": "assertEqualsの引数順",
+        "prompt": "JUnit の `assertEquals(a, b)` では、一般的に第1引数 `a` と第2引数 `b` にそれぞれ何を渡しますか？",
+        "choices": {
+          "A": "第1引数：実際の結果（actual）／ 第2引数：期待値（expected）",
+          "B": "第1引数：期待値（expected）／ 第2引数：実際の結果（actual）",
+          "C": "どちらもテストの名前を渡す",
+          "D": "どちらも `null` を渡す"
+        },
+        "answer": "B",
+        "explanation": "JUnitの `assertEquals(expected, actual)` は「期待値, 実際の値」の順で渡します。失敗時のメッセージも分かりやすくなります。"
+      },
+      {
+        "id": "L13_Q04",
+        "no": 4,
+        "topic": "例外発生のテスト",
+        "prompt": "「金額に `-100` を渡したら `IllegalArgumentException` が発生するはずだ」という異常系テストを書くときに使うアサーションはどれですか？",
+        "choices": {
+          "A": "`assertThrows(IllegalArgumentException.class, () -> ...)`",
+          "B": "`assertNull(...)`",
+          "C": "`try { ... } catch (Exception e) {}` だけで何もしない",
+          "D": "`System.exit(1)`"
+        },
+        "answer": "A",
+        "explanation": "`assertThrows` を使うと、指定した例外が投げられなければテスト失敗（FAIL）として検出できます。"
+      },
+      {
+        "id": "L13_Q05",
+        "no": 5,
+        "topic": "スタックトレースの読み方",
+        "prompt": "コンソールに数十行のスタックトレース（エラーログ）が出力されたとき、自分のコードのどこに原因があるか特定する最も効率的な見方はどれですか？",
+        "choices": {
+          "A": "一番下の行だけを読む",
+          "B": "1行目の「例外の種類とメッセージ」を確認し、続いて `at ...` の中から自分が作成したクラス名・行番号を探す",
+          "C": "エラーが出たらPCを再起動する",
+          "D": "ランダムにコードを削除してみる"
+        },
+        "answer": "B",
+        "explanation": "1行目の例外名＋原因メッセージと、`at 自分のクラス名(ファイル名:行番号)` を確認するのが鉄則です。"
+      },
+      {
+        "id": "L13_Q06",
+        "no": 6,
+        "topic": "境界値テストの考え方",
+        "prompt": "「金額は `1` 円以上を受け付け、`0` 円以下はエラーとする」という仕様をテストするとき、境界値テストとして最も重要な入力値の組み合わせはどれですか？",
+        "choices": {
+          "A": "`-1000` と `100000` だけ",
+          "B": "`0`（エラーになる最大の値）と `1`（正常になる最小の値）",
+          "C": "`\"あいうえお\"` だけ",
+          "D": "`500` だけ"
+        },
+        "answer": "B",
+        "explanation": "バグは「`>` と `>=` の間違い」など境界付近に潜みやすいため、`0` と `1` のテストが不可欠です。"
+      },
+      {
+        "id": "L13_Q07",
+        "no": 7,
+        "topic": "IllegalArgumentExceptionの役割",
+        "prompt": "メソッドの引数に「ありえない不正な値（マイナス金額や空文字など）」が渡されたときに投げるのが適切なJava標準例外はどれですか？",
+        "choices": {
+          "A": "`IllegalArgumentException`",
+          "B": "`FileNotFoundException`",
+          "C": "`OutOfMemoryError`",
+          "D": "`ArithmeticException`"
+        },
+        "answer": "A",
+        "explanation": "不正な引数（Illegal Argument）を知らせる標準例外が `IllegalArgumentException` です。"
+      },
+      {
+        "id": "L13_Q08",
+        "no": 8,
+        "topic": "@BeforeEachの役割",
+        "prompt": "テストクラス内で `@BeforeEach` を付けたメソッドは、いつ実行されますか？",
+        "choices": {
+          "A": "クラス内のすべてのテストが終わったあとに1回だけ",
+          "B": "各 `@Test` メソッドが実行される直前に毎回実行される（テスト同士が互いに影響しないよう初期化する）",
+          "C": "テストが失敗したときだけ実行される",
+          "D": "手動で呼び出さない限り実行されない"
+        },
+        "answer": "B",
+        "explanation": "テスト間の独立性を保つため、`@BeforeEach` で毎回クリーンな状態を用意します。"
+      },
+      {
+        "id": "L13_Q09",
+        "no": 9,
+        "topic": "AAAパターン",
+        "prompt": "読みやすいテストコードを書く基本構成「AAAパターン」の3つのステップの正しい並びはどれですか？",
+        "choices": {
+          "A": "Arrange（準備） → Act（実行） → Assert（検証）",
+          "B": "Add → Alter → Abort",
+          "C": "Ask → Answer → Archive",
+          "D": "Array → Attribute → Action"
+        },
+        "answer": "A",
+        "explanation": "Arrange（準備）→ Act（実行）→ Assert（検証）で書くと誰が見ても意図が明確になります。"
+      },
+      {
+        "id": "L13_Q10",
+        "no": 10,
+        "topic": "テストとリファクタリング",
+        "prompt": "テストコードが揃っている状態で、外部から見た動作を変えずにコード内部の読みやすさや構造を整理・改善する作業を何と呼びますか？",
+        "choices": {
+          "A": "リファクタリング（Refactoring）",
+          "B": "デプロイ（Deploy）",
+          "C": "シリアライズ（Serialize）",
+          "D": "コンパイルエラー（Compile Error）"
+        },
+        "answer": "A",
+        "explanation": "自動テストを安全網にして内部設計を綺麗に保つ作業をリファクタリングと呼びます。"
+      }
+    ]
+  },
+  {
+    "id": 14,
+    "lessonFile": "../lesson14.md",
+    "title": "第14章：Maven ＆ Spring Boot 大聖堂（最終決戦）",
+    "subtitle": "Maven / pom.xml / Spring Boot / @RestController / DI",
+    "areaName": "Spring Boot 天空聖堂",
+    "story": "ついに全14回の最終章！手動コンパイルを卒業し、Maven と Spring Boot の世界で「これまで学んだすべてが1つに繋がる瞬間」を体感せよ！",
+    "monster": {
+      "name": "レガシーモノリス魔王",
+      "title": "依存地獄と密結合を司る真のラスボス",
+      "emoji": "🏆",
+      "color": "#f59e0b",
+      "maxHp": 180,
+      "intro": "「手作業のJAR配置と密結合コードのまま、現代の開発現場へ進めると思うなよ！」",
+      "defeat": "「Mavenの `pom.xml`、DI、そして `@RestController` …君は真のJavaエンジニアとなった！」"
+    },
+    "badge": {
+      "id": "badge_14",
+      "name": "Javaフルスタック勇者王冠",
+      "icon": "🏆"
+    },
+    "tips": [
+      {
+        "title": "Maven 3大コマンド",
+        "code": "mvn compile   // コンパイル\nmvn test      // JUnit全テスト実行\nmvn package   // 実行可能JAR作成",
+        "note": "依存ライブラリは pom.xml に書いて自動管理する。"
+      },
+      {
+        "title": "Spring Boot Controller",
+        "code": "@RestController\n@RequestMapping(\"/api/kakeibo\")\npublic class KakeiboController {\n    @GetMapping\n    public List<KakeiboItem> list() { return repo.findAll(); }\n}",
+        "note": "オブジェクトを return するだけで自動的にJSONレスポンスになる。"
+      },
+      {
+        "title": "DI（依存性注入）",
+        "code": "private final KakeiboRepository repo;\npublic KakeiboController(KakeiboRepository repo) {\n    this.repo = repo;\n}",
+        "note": "new を自分で書かずコンストラクタ経由で受け取ることで、テスト時に差し替えやすくなる。"
+      }
+    ],
+    "codingQuests": [
+      {
+        "id": "q_14_1",
+        "title": "Spring Boot の REST Controller を完成させよ",
+        "description": "JSONを返す Controller 宣言と、GETリクエストのマッピングを完成させよう。",
+        "codeTemplate": "[1]\npublic class KakeiboController {\n    [2](\"/api/kakeibo\")\n    public List<KakeiboItem> list(@RequestParam(required = false) String keyword) {\n        return repo.search(keyword);\n    }\n}",
+        "blanks": [
+          {
+            "label": "[1]",
+            "options": [
+              "@RestController",
+              "@WebServlet",
+              "@JspPage",
+              "@Entity"
+            ],
+            "answer": "@RestController"
+          },
+          {
+            "label": "[2]",
+            "options": [
+              "@GetMapping",
+              "@DoGet",
+              "@SelectMapping",
+              "@UrlRoute"
+            ],
+            "answer": "@GetMapping"
+          }
+        ],
+        "hint": "JSONを返すControllerクラス用アノテーションと、HTTP GETを受け取るメソッド用アノテーションです。",
+        "explanation": "`@RestController` と `@GetMapping` を使うと、Servletの `doGet` や JSON変換を自動処理してくれます。"
+      },
+      {
+        "id": "q_14_2",
+        "title": "DI（コンストラクタ注入）の実装",
+        "description": "密結合な `new KakeiboRepository()` をやめ、Spring の DI で依存を受け取るコンストラクタを完成させよう。",
+        "codeTemplate": "private final KakeiboRepository repo;\npublic [1]([2] repo) {\n    this.repo = repo;\n}",
+        "blanks": [
+          {
+            "label": "[1]",
+            "options": [
+              "KakeiboController",
+              "void",
+              "inject",
+              "init"
+            ],
+            "answer": "KakeiboController"
+          },
+          {
+            "label": "[2]",
+            "options": [
+              "KakeiboRepository",
+              "String",
+              "HttpServlet",
+              "Object"
+            ],
+            "answer": "KakeiboRepository"
+          }
+        ],
+        "hint": "コンストラクタはクラス名と同じ名前で、受け取りたい部品の型を引数に書きます。",
+        "explanation": "コンストラクタの引数に `KakeiboRepository repo` を書くと、Spring が自動でインスタンスを注入してくれます。"
+      }
+    ],
+    "codePuzzle": {
+      "id": "p_14",
+      "title": "Spring Boot コントローラの処理フロー",
+      "description": "DIされたリポジトリを使って検索・保存する `@RestController` の構造を正しい順に並べよう。",
+      "steps": [
+        "@RestController",
+        "public class KakeiboController {",
+        "    private final KakeiboRepository repo;",
+        "    public KakeiboController(KakeiboRepository repo) { this.repo = repo; }",
+        "    @GetMapping(\"/api/items\") public List<KakeiboItem> all() { return repo.findAll(); }",
+        "}"
+      ],
+      "hint": "クラスアノテーション → クラス宣言 → finalフィールド → コンストラクタ(DI) → @GetMappingメソッド → 閉じカッコ。",
+      "explanation": "フィールドを `private final` にしてコンストラクタで注入するのが Spring Boot 推奨のベストプラクティスです。"
+    },
+    "questions": [
+      {
+        "id": "L14_Q01",
+        "no": 1,
+        "topic": "Mavenの設定ファイル",
+        "prompt": "Mavenプロジェクトにおいて、使用するライブラリ（依存関係）やJavaバージョン、ビルド設定を記述する設定ファイルの名前はどれですか？",
+        "choices": {
+          "A": "`package.json`",
+          "B": "`pom.xml`",
+          "C": "`requirements.txt`",
+          "D": "`build.sh`"
+        },
+        "answer": "B",
+        "explanation": "Mavenでは `pom.xml`（Project Object Model）に依存関係やビルド設定を記述します。"
+      },
+      {
+        "id": "L14_Q02",
+        "no": 2,
+        "topic": "Mavenのテスト実行コマンド",
+        "prompt": "Mavenプロジェクトで、`src/test/java` 配下にある JUnit テストを一括実行するコマンドはどれですか？",
+        "choices": {
+          "A": "`mvn test`",
+          "B": "`mvn check`",
+          "C": "`java test`",
+          "D": "`javac --test`"
+        },
+        "answer": "A",
+        "explanation": "`mvn test` でプロジェクト内の単体テストを一括実行できます。"
+      },
+      {
+        "id": "L14_Q03",
+        "no": 3,
+        "topic": "Mavenの標準ディレクトリ構成",
+        "prompt": "Mavenの標準構成において、アプリケーション本体のJavaソースコード（`KakeiboItem.java` など）を配置するフォルダはどれですか？",
+        "choices": {
+          "A": "`src/main/java`",
+          "B": "`src/test/java`",
+          "C": "`WEB-INF/lib`",
+          "D": "`target/classes`"
+        },
+        "answer": "A",
+        "explanation": "本番コードは `src/main/java`、テストコードは `src/test/java` に配置するのがMavenの標準規約です。"
+      },
+      {
+        "id": "L14_Q04",
+        "no": 4,
+        "topic": "Spring Bootのアノテーション：JSON API",
+        "prompt": "Spring Bootで、メソッドの戻り値（`List<KakeiboItem>` など）を自動的にJSONへ変換してレスポンスとして返すControllerクラスに付けるアノテーションはどれですか？",
+        "choices": {
+          "A": "`@WebServlet`",
+          "B": "`@RestController`",
+          "C": "`@Entity`",
+          "D": "`@Override`"
+        },
+        "answer": "B",
+        "explanation": "`@RestController` を使うと、戻り値のオブジェクトやリストが自動的にJSONへシリアライズされます。"
+      },
+      {
+        "id": "L14_Q05",
+        "no": 5,
+        "topic": "GETとPOSTのルーティング",
+        "prompt": "Spring MVC / Spring Boot で、HTTPの `GET` リクエストと `POST` リクエストをそれぞれ受け取るメソッドに付けるアノテーションの組み合わせはどれですか？",
+        "choices": {
+          "A": "GET：`@GetMapping` ／ POST：`@PostMapping`",
+          "B": "GET：`@DoGet` ／ POST：`@DoPost`",
+          "C": "GET：`@Select` ／ POST：`@Insert`",
+          "D": "GET：`@Read` ／ POST：`@Write`"
+        },
+        "answer": "A",
+        "explanation": "`@GetMapping` と `@PostMapping` でHTTPメソッドごとの処理を簡潔に記述できます。"
+      },
+      {
+        "id": "L14_Q06",
+        "no": 6,
+        "topic": "DI：依存性注入のメリット",
+        "prompt": "クラス内部で直接 `new KakeiboDAO()` と書かず、コンストラクタ経由で外から部品（依存オブジェクト）を受け取る **DI（Dependency Injection）** を使う主なメリットは何ですか？",
+        "choices": {
+          "A": "テスト時に本物のDBの代わりにモック（テスト用ダミー）へ差し替えやすく、変更に強い設計になる",
+          "B": "クラスを1つも作らなくてよくなる",
+          "C": "Javaの変数型がすべて `var` になる",
+          "D": "HTMLを書かなくても自動でデザインが生成される"
+        },
+        "answer": "A",
+        "explanation": "部品の生成と結合を外部（DIコンテナ）に任せることで、結合度が下がり単体テストが圧倒的に書きやすくなります。"
+      },
+      {
+        "id": "L14_Q07",
+        "no": 7,
+        "topic": "@RequestParamの役割",
+        "prompt": "URLのクエリ `/search?keyword=弁当` から `\"弁当\"` をメソッドの引数 `String keyword` で受け取るために使うSpringのアノテーションはどれですか？",
+        "choices": {
+          "A": "`@RequestParam`",
+          "B": "`@RequestBody`",
+          "C": "`@PathVariable`",
+          "D": "`@Autowired`"
+        },
+        "answer": "A",
+        "explanation": "クエリ文字列やフォームのパラメータ受け取りには `@RequestParam` を使います（JSONボディには `@RequestBody`）。"
+      },
+      {
+        "id": "L14_Q08",
+        "no": 8,
+        "topic": "組み込みTomcatの特徴",
+        "prompt": "従来のServlet構成では自分でTomcatをインストールして `webapps/` に配置していましたが、Spring Bootではどう変わりますか？",
+        "choices": {
+          "A": "Tomcatがアプリの中に組み込まれているため、`java -jar` で1ファイルのままWebサーバーを起動できる",
+          "B": "ブラウザの拡張機能だけでサーバーが動く",
+          "C": "HTTP通信を使わなくなる",
+          "D": "SQLiteしか使えなくなる"
+        },
+        "answer": "A",
+        "explanation": "組み込みサーバー（Embedded Tomcat）により、クラウドやDockerへのデプロイも極めて簡単になります。"
+      },
+      {
+        "id": "L14_Q09",
+        "no": 9,
+        "topic": "3層アーキテクチャの責務分離",
+        "prompt": "Webアプリケーションを「Presentation（Controller/View）」「Business Logic（Service/Model）」「Data Access（DAO/Repository）」の3層に分ける目的として最も適切なものはどれですか？",
+        "choices": {
+          "A": "画面表示・業務ルール・DB操作の責務を分離し、変更やテストをしやすくするため",
+          "B": "ファイル数を増やして難しく見せるため",
+          "C": "コンパイル時間を長くするため",
+          "D": "CSSを動かなくするため"
+        },
+        "answer": "A",
+        "explanation": "関心事の分離（Separation of Concerns）により、UI変更やDB移行時の影響範囲を局所化できます。"
+      },
+      {
+        "id": "L14_Q10",
+        "no": 10,
+        "topic": "全14回の総括",
+        "prompt": "基礎構文・オブジェクト指向・Web(Servlet/JSP)・DB(JDBC/SQL)・JSON API・JUnitテスト・Maven/Spring Boot を通して、これからのJava開発で最も大切な姿勢はどれですか？",
+        "choices": {
+          "A": "小さく動かして検証し（MEP/単体テスト）、責務ごとにクラスを分けて（MVC/DAO）、公式ドキュメントやエラーログ（スタックトレース）を読みながら改善を続けること",
+          "B": "1000行の処理をすべて1つの `main` メソッドに書くこと",
+          "C": "エラーが出たら原因を読まずに毎回最初から作り直すこと",
+          "D": "テストも入力チェックも一切書かないこと"
+        },
+        "answer": "A",
+        "explanation": "基礎概念・設計・テスト・エラー読解の積み重ねが、どんなフレームワークでも通用するエンジニア力になります！"
       }
     ]
   }

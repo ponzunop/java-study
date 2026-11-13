@@ -520,15 +520,16 @@ JSPやJavaコードでよく使われる `item.isIncome() ? "+" : "-"` という
 
 ---
 
-<div style="background: #e8f5e9; border: 2px solid #2e7d32; padding: 20px; border-radius: 12px; margin-top: 28px; text-align: center; color: #1b5e20;">
-  <h2 style="margin-top: 0; color: #2e7d32;">🎓 全10回カリキュラム完走、おめでとうございます！</h2>
+<div style="background: #e3f2fd; border: 2px solid #1976d2; padding: 20px; border-radius: 12px; margin-top: 28px; text-align: center; color: #0d47a1;">
+  <h2 style="margin-top: 0; color: #1565c0;">🎉 基本編（第1回〜第10回）「MyKakeibo」完成おめでとうございます！</h2>
   <p style="margin-bottom: 0; color: #1e293b;">
-    『やさしいJava』の基礎からスタートし、自分の手でWebアプリケーション「MyKakeibo」を完成させました！<br>
-    この教材のコードをベースに、グラフ表示を足したり、データベース（SQL）に接続したりして、あなただけのアプリへさらに進化させてみてください！
+    『やさしいJava』の基礎からスタートし、自分の手でServlet/JSP Webアプリ「MyKakeibo」を完成させました！<br>
+    さらに実務レベルへステップアップするため、<strong>第11回〜第14回（発展編：SQL/JDBC・HashMap/JSON API・JUnitテスト・Maven/Spring Boot）</strong>へ進みましょう！
   </p>
 </div>
 
 <div style="display: flex; justify-content: space-between; margin-top: 20px;">
   <a href="./lesson09.md">👈 第9回へ戻る</a>
-  <a href="./README.md" style="font-weight: bold; color: #0d47a1;">🏠 カリキュラム目次トップへ戻る</a>
+  <a href="./README.md">🏠 カリキュラム目次</a>
+  <a href="./lesson11.md" style="font-weight: bold; color: #00695c;">👉 第11回：データベース連携（SQLとJDBC）へ進む</a>
 </div>
