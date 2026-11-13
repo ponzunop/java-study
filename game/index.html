@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Java Quest: MyKakeibo RPG — ゲームで学ぶJava全10回</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="hud">
+      <div class="hud-brand">
+        <div class="brand-badge">JAVA RPG</div>
+        <div>
+          <h1>Java Quest: MyKakeibo RPG</h1>
+          <p class="subtitle">全10回「家計簿Webアプリ」カリキュラム連動ゲーム</p>
+        </div>
+      </div>
+
+      <div class="hud-stats">
+        <div class="stat-pill level-pill">
+          <span class="stat-label" id="player-title">Java見習い勇者</span>
+          <strong id="player-level">Lv.1</strong>
+          <div class="mini-bar"><div id="exp-bar-fill" class="mini-bar-fill exp"></div></div>
+          <small id="exp-text">0 / 80 EXP</small>
+        </div>
+        <div class="stat-pill">
+          <span class="stat-label">総クリア</span>
+          <strong id="hud-cleared">0 / 10章</strong>
+          <small id="hud-stars">★ 0 / 30</small>
+        </div>
+        <div class="stat-pill">
+          <span class="stat-label">コード修復</span>
+          <strong id="hud-quests">0 / 20</strong>
+          <small id="hud-accuracy">正答率 0%</small>
+        </div>
+        <div class="stat-pill">
+          <span class="stat-label">コイン</span>
+          <strong id="hud-coins">0 G</strong>
+          <small id="hud-combo">最大コンボ 0</small>
+        </div>
+      </div>
+
+      <div class="hud-actions">
+        <button id="btn-unlock-all" class="btn btn-ghost btn-sm" title="全ステージを解放して好きな章から挑戦できます">全章アンロック</button>
+        <button id="btn-sound" class="btn btn-ghost btn-sm" title="効果音のON/OFF">🔊 効果音 ON</button>
+        <a href="../README.md" class="btn btn-ghost btn-sm" target="_blank" rel="noopener">📚 講義資料</a>
+        <button id="btn-reset" class="btn btn-danger btn-sm">記録リセット</button>
+      </div>
+    </header>
+
+    <nav class="nav-tabs" aria-label="ゲームメニュー">
+      <button class="nav-tab active" data-view="map">🗺️ 冒険マップ</button>
+      <button class="nav-tab" data-view="quests">💻 コード修復クエスト</button>
+      <button class="nav-tab" data-view="review">⚡ 弱点特訓 <span id="weak-count-badge" class="count-badge">0</span></button>
+      <button class="nav-tab" data-view="survival">⏱️ ランダム10問試験</button>
+      <button class="nav-tab" data-view="badges">🏆 図鑑・バッジ</button>
+    </nav>
+
+    <main id="main-content" class="main-content">
+      <!-- Views rendered by app.js -->
+    </main>
+  </div>
+
+  <!-- Stage Briefing Modal -->
+  <div id="briefing-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="briefing-title">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <span class="stage-chip" id="briefing-area">AREA</span>
+          <h2 id="briefing-title">ステージタイトル</h2>
+          <p id="briefing-subtitle" class="muted"></p>
+        </div>
+        <button id="briefing-close" class="btn btn-ghost btn-sm" aria-label="閉じる">✕</button>
+      </div>
+      <div id="briefing-body" class="modal-body"></div>
+      <div class="modal-footer">
+        <a id="briefing-lesson-link" href="#" target="_blank" rel="noopener" class="btn btn-ghost">📖 元の講義資料を読む</a>
+        <button id="briefing-start-battle" class="btn btn-primary btn-lg">⚔️ モンスターと戦う（10問）</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="data/stages.js"></script>
+  <script src="engine.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
