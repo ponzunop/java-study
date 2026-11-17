@@ -3,17 +3,25 @@
 
   const STAGES = window.JavaQuestStages || [];
   const Engine = window.JavaQuestEngine;
+  const Glossary = window.JavaQuestGlossary;
+  const Markdown = window.JavaQuestMarkdown;
 
   let state = loadState();
   let currentView = 'map';
   let unlockAllMode = false;
   let activeBattle = null;
   let briefingStageId = null;
+  let activeLecturePath = '../README.md';
+  let glossarySearchQuery = '';
+  let glossaryCategory = 'すべて';
   let audioCtx = null;
   const puzzleSessions = {};
+  const lectureCache = {};
 
   const mainEl = document.getElementById('main-content');
   const modalEl = document.getElementById('briefing-modal');
+  const lectureModalEl = document.getElementById('lecture-modal');
+  const glossaryModalEl = document.getElementById('glossary-modal');
 
   function loadState() {
     try {
@@ -41,7 +49,8 @@
       .replace(/'/g, '&#39;');
   }
 
-  function renderRichText(rawText) {
+  function renderRichText(rawText, options) {
+    const opts = options || {};
     const parts = String(rawText).split(/(```[\s\S]*?```)/g);
     return parts
       .map((part) => {
@@ -53,9 +62,31 @@
         html = html.replace(/`([^`]+)`/g, '<code class="inline-code">$1</code>');
         html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
         html = html.replace(/\n/g, '<br />');
+        if (!opts.disableGlossary && Glossary && Glossary.annotateHtmlWithGlossary) {
+          html = Glossary.annotateHtmlWithGlossary(html);
+        }
         return html;
       })
       .join('');
+  }
+
+  function renderGlossaryPills(texts, maxCount) {
+    if (!Glossary || !Glossary.findTermsInText) return '';
+    const joined = (Array.isArray(texts) ? texts : [texts]).filter(Boolean).join('\n');
+    const found = Glossary.findTermsInText(joined).slice(0, maxCount || 6);
+    if (found.length === 0) return '';
+    const pills = found
+      .map(
+        (t) =>
+          `<button type="button" class="glossary-pill" data-glossary-id="${escapeHtml(t.id)}" title="${escapeHtml(t.short)}">📖 ${escapeHtml(t.term)}</button>`
+      )
+      .join('');
+    return `
+      <div class="glossary-pills-bar">
+        <span class="glossary-pills-label">💡 用語解説（タップで確認）:</span>
+        ${pills}
+      </div>
+    `;
   }
 
   function shuffleArray(arr) {
@@ -154,6 +185,7 @@
     if (currentView === 'map') renderMapView();
     else if (currentView === 'quests') renderQuestsView();
     else if (currentView === 'puzzles') renderPuzzlesView();
+    else if (currentView === 'glossary') renderGlossaryView();
     else if (currentView === 'shop') renderShopView();
     else if (currentView === 'review') renderReviewView();
     else if (currentView === 'survival') renderSurvivalView();
@@ -201,7 +233,7 @@
             <button class="btn btn-primary" data-action="open-briefing" data-stage="${stage.id}" ${!unlocked ? 'disabled' : ''}>
               ${!unlocked ? '🔒 前章クリアで解放' : cleared ? '⚔️ 再挑戦 / 予習' : '⚔️ 挑戦する'}
             </button>
-            <a href="${escapeHtml(stage.lessonFile)}" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">📖 講義</a>
+            <button type="button" class="btn btn-ghost btn-sm" data-open-lecture="${escapeHtml(stage.lessonFile)}">📖 講義</button>
           </div>
         </article>
       `;
@@ -223,6 +255,9 @@
     mainEl.querySelectorAll('[data-action="open-briefing"]').forEach((btn) => {
       btn.addEventListener('click', () => openBriefing(Number(btn.dataset.stage)));
     });
+    mainEl.querySelectorAll('[data-open-lecture]').forEach((btn) => {
+      btn.addEventListener('click', () => openLectureModal(btn.dataset.openLecture));
+    });
     const quickBtn = document.getElementById('banner-quick-start');
     if (quickBtn) {
       quickBtn.addEventListener('click', () => openBriefing(nextStageNum));
@@ -237,7 +272,8 @@
     document.getElementById('briefing-area').textContent = `STAGE ${stage.id} ・ ${stage.areaName}`;
     document.getElementById('briefing-title').textContent = stage.title;
     document.getElementById('briefing-subtitle').textContent = stage.subtitle;
-    document.getElementById('briefing-lesson-link').href = stage.lessonFile;
+    const lessonBtn = document.getElementById('briefing-lesson-link');
+    lessonBtn.dataset.lessonFile = stage.lessonFile;
 
     const tipsHtml = stage.tips
       .map(
@@ -251,6 +287,11 @@
       )
       .join('');
 
+    const glossaryBar = renderGlossaryPills(
+      [stage.title, stage.subtitle, stage.story, ...stage.tips.map((t) => `${t.title} ${t.code} ${t.note}`)],
+      8
+    );
+
     document.getElementById('briefing-body').innerHTML = `
       <p>${renderRichText(stage.story)}</p>
       <div class="monster-preview" style="margin: 14px 0;">
@@ -260,6 +301,7 @@
           <p class="muted">${renderRichText(stage.monster.intro)}</p>
         </div>
       </div>
+      ${glossaryBar}
       <h3 style="margin:14px 0 8px;">⚡ バトル前の要点チートシート</h3>
       ${tipsHtml}
     `;
@@ -623,6 +665,7 @@
             <span>キー操作: A/B/C/D または 1/2/3/4</span>
           </div>
           <div class="question-prompt">${renderRichText(q.prompt)}</div>
+          ${renderGlossaryPills([q.topic, q.prompt, q.choices.A, q.choices.B, q.choices.C, q.choices.D, fb ? fb.explanation : ''], 5)}
           ${itemButtonsHtml}
           <div class="choices-grid">${choicesHtml}</div>
           ${feedbackHtml}
@@ -673,6 +716,7 @@
               </div>
               <p class="muted" style="margin-top:6px;">${renderRichText(quest.description)}</p>
               <pre class="code-block"><code>${formattedCode}</code></pre>
+              ${renderGlossaryPills([quest.title, quest.description, quest.codeTemplate], 4)}
               <div class="blank-row">${selectsHtml}</div>
               <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">
                 <button class="btn btn-primary btn-sm" data-check-quest="${stage.id}:${quest.id}">🔨 コードを実行判定</button>
@@ -814,6 +858,7 @@
               <span>${solved ? '✅ クリア済み' : '🧩 未クリア (+40 EXP / +30 G)'}</span>
             </div>
             <p class="muted" style="margin-top:6px;">${renderRichText(p.description)}</p>
+            ${renderGlossaryPills([p.title, p.description, ...p.steps], 4)}
             <div class="puzzle-columns">
               <div class="puzzle-pane">
                 <div class="puzzle-pane-title">📦 コード部品（クリックで追加）</div>
@@ -1065,9 +1110,258 @@
     `;
   }
 
+  function getGlossaryCategories() {
+    const terms = (Glossary && Glossary.TERMS) || [];
+    const cats = ['すべて'];
+    for (const t of terms) {
+      if (t.category && !cats.includes(t.category)) cats.push(t.category);
+    }
+    return cats;
+  }
+
+  function filterGlossaryTerms() {
+    const terms = (Glossary && Glossary.TERMS) || [];
+    const q = glossarySearchQuery.trim().toLowerCase();
+    return terms.filter((t) => {
+      const catOk = glossaryCategory === 'すべて' || t.category === glossaryCategory;
+      if (!catOk) return false;
+      if (!q) return true;
+      const haystack = [t.term, t.reading, t.short, t.detail, t.stage, ...(t.aliases || [])]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase();
+      return haystack.includes(q);
+    });
+  }
+
+  function renderGlossaryCardsHtml(items) {
+    if (items.length === 0) {
+      return `
+        <div class="battle-shell" style="text-align:center;padding:28px;">
+          <p class="muted">該当する用語が見つかりませんでした。検索語やカテゴリを変えてお試しください。</p>
+        </div>
+      `;
+    }
+    return `
+      <div class="glossary-grid">
+        ${items
+          .map(
+            (t) => `
+          <article class="glossary-card">
+            <div class="glossary-card-head">
+              <div>
+                <h3>${escapeHtml(t.term)}</h3>
+                <div class="glossary-reading">${escapeHtml(t.reading)}</div>
+              </div>
+              <span class="stage-chip">${escapeHtml(t.stage)}</span>
+            </div>
+            <div class="glossary-summary-box">${escapeHtml(t.short)}</div>
+            <p class="muted" style="font-size:0.86rem;line-height:1.65;">${escapeHtml(t.detail)}</p>
+            ${t.example ? `<pre class="code-block" style="margin:4px 0 0;"><code>${escapeHtml(t.example)}</code></pre>` : ''}
+          </article>
+        `
+          )
+          .join('')}
+      </div>
+    `;
+  }
+
+  function renderGlossaryView() {
+    const categories = getGlossaryCategories();
+    const filtered = filterGlossaryTerms();
+    const chipsHtml = categories
+      .map(
+        (cat) =>
+          `<button type="button" class="filter-chip ${glossaryCategory === cat ? 'active' : ''}" data-glossary-cat="${escapeHtml(cat)}">${escapeHtml(cat)}</button>`
+      )
+      .join('');
+
+    mainEl.innerHTML = `
+      <section class="section-banner">
+        <div>
+          <h2>📖 Java &amp; Web開発 用語集（全${(Glossary && Glossary.TERMS.length) || 0}語）</h2>
+          <p class="muted">「コンパイルって何？」「MVCやDAOって？」と迷ったらここで確認！バトル中の点線つき用語をタップしても解説が開きます。</p>
+        </div>
+        <span class="stage-chip" id="glossary-count">${filtered.length} 件表示</span>
+      </section>
+      <div class="glossary-controls">
+        <input id="glossary-search-input" class="glossary-search" type="search" value="${escapeHtml(glossarySearchQuery)}" placeholder="🔍 用語を検索（例：コンパイル、クラス、Servlet、MVC、SQL...）" />
+        <div class="glossary-filter-chips">${chipsHtml}</div>
+      </div>
+      <div id="glossary-results">${renderGlossaryCardsHtml(filtered)}</div>
+    `;
+
+    const searchInput = document.getElementById('glossary-search-input');
+    searchInput.addEventListener('input', (e) => {
+      glossarySearchQuery = e.target.value;
+      const nextFiltered = filterGlossaryTerms();
+      const countEl = document.getElementById('glossary-count');
+      const resultsEl = document.getElementById('glossary-results');
+      if (countEl) countEl.textContent = `${nextFiltered.length} 件表示`;
+      if (resultsEl) resultsEl.innerHTML = renderGlossaryCardsHtml(nextFiltered);
+    });
+
+    mainEl.querySelectorAll('[data-glossary-cat]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        glossaryCategory = btn.dataset.glossaryCat;
+        renderGlossaryView();
+      });
+    });
+  }
+
+  function openGlossaryModal(termId) {
+    if (!Glossary || !Glossary.getTermById) return;
+    const entry = Glossary.getTermById(termId);
+    if (!entry) return;
+
+    document.getElementById('glossary-modal-meta').textContent = `${entry.category} ・ ${entry.stage}`;
+    document.getElementById('glossary-modal-term').textContent = entry.term;
+    document.getElementById('glossary-modal-reading').textContent = entry.reading;
+    document.getElementById('glossary-modal-body').innerHTML = `
+      <div class="glossary-summary-box">${escapeHtml(entry.short)}</div>
+      <div class="glossary-detail-box">${escapeHtml(entry.detail)}</div>
+      ${entry.example ? `<div style="font-size:0.8rem;font-weight:700;color:#7dd3fc;margin-bottom:4px;">💻 コード・コマンド例</div><pre class="code-block"><code>${escapeHtml(entry.example)}</code></pre>` : ''}
+    `;
+
+    glossaryModalEl.classList.remove('hidden');
+  }
+
+  function closeGlossaryModal() {
+    glossaryModalEl.classList.add('hidden');
+  }
+
+  function getLectureCatalog() {
+    const items = [{ path: '../README.md', label: '🏠 カリキュラム目次 (README)' }];
+    STAGES.forEach((s) => {
+      items.push({ path: normalizeLecturePath(s.lessonFile), label: `📖 ${s.title}` });
+    });
+    return items;
+  }
+
+  function normalizeLecturePath(rawHref) {
+    const clean = String(rawHref || '').split('#')[0].split('?')[0].trim();
+    if (!clean || clean === 'README.md' || clean === './README.md' || clean === '../README.md') {
+      return '../README.md';
+    }
+    const fileName = clean.replace(/^\.\//, '').replace(/^\.\.\//, '');
+    if (/^lesson\d+\.md$/i.test(fileName)) {
+      return `../${fileName}`;
+    }
+    return clean;
+  }
+
+  let mermaidLoadStarted = false;
+  function tryRenderMermaid(container) {
+    const mermaidNodes = container.querySelectorAll('pre.mermaid');
+    if (mermaidNodes.length === 0) return;
+
+    const runMermaid = () => {
+      try {
+        if (window.mermaid) {
+          window.mermaid.initialize({ startOnLoad: false, theme: 'default' });
+          window.mermaid.run({ nodes: mermaidNodes });
+        }
+      } catch (_) {
+        // Fallback: pre.mermaid stays cleanly visible as text
+      }
+    };
+
+    if (window.mermaid) {
+      runMermaid();
+      return;
+    }
+    if (mermaidLoadStarted) return;
+    mermaidLoadStarted = true;
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js';
+    script.async = true;
+    script.onload = runMermaid;
+    document.head.appendChild(script);
+  }
+
+  async function openLectureModal(filePath) {
+    const targetPath = normalizeLecturePath(filePath);
+    activeLecturePath = targetPath;
+
+    const catalog = getLectureCatalog();
+    const selectEl = document.getElementById('lecture-select');
+    selectEl.innerHTML = catalog
+      .map((item) => `<option value="${escapeHtml(item.path)}">${escapeHtml(item.label)}</option>`)
+      .join('');
+    selectEl.value = targetPath;
+
+    const currentIdx = catalog.findIndex((item) => item.path === targetPath);
+    const titleEl = document.getElementById('lecture-modal-title');
+    titleEl.textContent = currentIdx >= 0 ? catalog[currentIdx].label : targetPath;
+
+    document.getElementById('lecture-prev').disabled = currentIdx <= 0;
+    document.getElementById('lecture-next').disabled = currentIdx < 0 || currentIdx >= catalog.length - 1;
+
+    const bodyEl = document.getElementById('lecture-body');
+    const scrollEl = document.getElementById('lecture-modal-scroll');
+    bodyEl.innerHTML = '<p class="lecture-p">📖 講義資料を読み込んでいます...</p>';
+    lectureModalEl.classList.remove('hidden');
+    if (scrollEl) scrollEl.scrollTop = 0;
+
+    try {
+      let mdText = lectureCache[targetPath];
+      if (!mdText) {
+        const res = await fetch(targetPath);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        mdText = await res.text();
+        lectureCache[targetPath] = mdText;
+      }
+
+      let renderedHtml = Markdown ? Markdown.renderMarkdown(mdText) : `<pre>${escapeHtml(mdText)}</pre>`;
+      if (Glossary && Glossary.annotateHtmlWithGlossary) {
+        renderedHtml = Glossary.annotateHtmlWithGlossary(renderedHtml);
+      }
+      bodyEl.innerHTML = renderedHtml;
+
+      // Intercept links inside lecture material so tapping another lesson stays inside the reader!
+      bodyEl.querySelectorAll('a[href]').forEach((link) => {
+        const href = link.getAttribute('href') || '';
+        if (href.startsWith('#')) return;
+        if (href.includes('game/index.html')) {
+          link.addEventListener('click', (e) => {
+            e.preventDefault();
+            closeLectureModal();
+          });
+          return;
+        }
+        const withoutHash = href.split('#')[0];
+        if (/\.md$/i.test(withoutHash) && !/^https?:\/\//i.test(href)) {
+          link.addEventListener('click', (e) => {
+            e.preventDefault();
+            openLectureModal(withoutHash);
+          });
+        } else if (/^https?:\/\//i.test(href)) {
+          link.setAttribute('target', '_blank');
+          link.setAttribute('rel', 'noopener noreferrer');
+        }
+      });
+
+      tryRenderMermaid(bodyEl);
+    } catch (err) {
+      const fileHint =
+        window.location.protocol === 'file:'
+          ? 'ファイルを直接（<code>file://</code>）開いているため、ブラウザのセキュリティ制限で外部Markdownを読み込めません。<br>ターミナルで <code>./run_game.sh</code> を実行し、表示される <code>http://...</code> のURLから開くとスマホ・PCどちらでも綺麗に読めます！'
+          : `講義資料（<code>${escapeHtml(targetPath)}</code>）の読み込みに失敗しました（${escapeHtml(err.message)}）。`;
+      bodyEl.innerHTML = `<div class="lecture-error-box"><strong>⚠️ 講義資料を表示できませんでした</strong><p style="margin:8px 0 0;">${fileHint}</p></div>`;
+    }
+  }
+
+  function closeLectureModal() {
+    lectureModalEl.classList.add('hidden');
+  }
+
   // Event listeners
   document.querySelectorAll('.nav-tab').forEach((tab) => {
     tab.addEventListener('click', () => setActiveTab(tab.dataset.view));
+  });
+
+  document.getElementById('btn-open-lectures').addEventListener('click', () => {
+    openLectureModal('../README.md');
   });
 
   document.getElementById('briefing-close').addEventListener('click', closeBriefing);
@@ -1075,8 +1369,59 @@
     if (e.target === modalEl) closeBriefing();
   });
 
+  document.getElementById('briefing-lesson-link').addEventListener('click', (e) => {
+    const file = e.currentTarget.dataset.lessonFile || '../README.md';
+    closeBriefing();
+    openLectureModal(file);
+  });
+
   document.getElementById('briefing-start-battle').addEventListener('click', () => {
     if (briefingStageId) startBattle('stage', { stageId: briefingStageId });
+  });
+
+  document.getElementById('lecture-select').addEventListener('change', (e) => {
+    openLectureModal(e.target.value);
+  });
+  document.getElementById('lecture-prev').addEventListener('click', () => {
+    const catalog = getLectureCatalog();
+    const idx = catalog.findIndex((item) => item.path === activeLecturePath);
+    if (idx > 0) openLectureModal(catalog[idx - 1].path);
+  });
+  document.getElementById('lecture-next').addEventListener('click', () => {
+    const catalog = getLectureCatalog();
+    const idx = catalog.findIndex((item) => item.path === activeLecturePath);
+    if (idx >= 0 && idx < catalog.length - 1) openLectureModal(catalog[idx + 1].path);
+  });
+  document.getElementById('lecture-close').addEventListener('click', closeLectureModal);
+  document.getElementById('lecture-close-bottom').addEventListener('click', closeLectureModal);
+  document.getElementById('lecture-open-glossary').addEventListener('click', () => {
+    closeLectureModal();
+    setActiveTab('glossary');
+  });
+  lectureModalEl.addEventListener('click', (e) => {
+    if (e.target === lectureModalEl) closeLectureModal();
+  });
+
+  document.getElementById('glossary-close').addEventListener('click', closeGlossaryModal);
+  document.getElementById('glossary-ok').addEventListener('click', closeGlossaryModal);
+  document.getElementById('glossary-goto-all').addEventListener('click', () => {
+    closeGlossaryModal();
+    closeBriefing();
+    closeLectureModal();
+    setActiveTab('glossary');
+  });
+  glossaryModalEl.addEventListener('click', (e) => {
+    if (e.target === glossaryModalEl) closeGlossaryModal();
+  });
+
+  // Global delegation for any inline glossary term or glossary pill anywhere in the app
+  document.addEventListener('click', (e) => {
+    const trigger = e.target.closest('[data-glossary-id]');
+    if (trigger) {
+      e.preventDefault();
+      e.stopPropagation();
+      openGlossaryModal(trigger.dataset.glossaryId);
+    }
   });
 
   document.getElementById('btn-sound').addEventListener('click', () => {
@@ -1099,6 +1444,27 @@
   });
 
   document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      if (!glossaryModalEl.classList.contains('hidden')) {
+        closeGlossaryModal();
+        return;
+      }
+      if (!lectureModalEl.classList.contains('hidden')) {
+        closeLectureModal();
+        return;
+      }
+      if (!modalEl.classList.contains('hidden')) {
+        closeBriefing();
+        return;
+      }
+    }
+    if (
+      !glossaryModalEl.classList.contains('hidden') ||
+      !lectureModalEl.classList.contains('hidden') ||
+      !modalEl.classList.contains('hidden')
+    ) {
+      return;
+    }
     if (!activeBattle || activeBattle.finished) return;
     const keyMap = { '1': 'A', '2': 'B', '3': 'C', '4': 'D', a: 'A', b: 'B', c: 'C', d: 'D' };
     const k = e.key.toLowerCase();

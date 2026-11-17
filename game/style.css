@@ -1046,3 +1046,484 @@ button,
   }
 }
 
+/* ================================
+   Glossary & Inline Term Tooltips
+   ================================ */
+.glossary-inline {
+  appearance: none;
+  background: rgba(56, 189, 248, 0.12);
+  border: none;
+  border-bottom: 1.5px dashed #38bdf8;
+  border-radius: 4px;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  padding: 0 4px;
+  margin: 0 1px;
+  cursor: pointer;
+  display: inline;
+  text-align: left;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.glossary-inline:hover {
+  background: rgba(56, 189, 248, 0.28);
+}
+
+.lecture-paper .glossary-inline {
+  background: rgba(25, 118, 210, 0.08);
+  border-bottom: 1.5px dashed #1976d2;
+  color: #0d47a1;
+}
+
+.lecture-paper .glossary-inline:hover {
+  background: rgba(25, 118, 210, 0.18);
+}
+
+.glossary-pills-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.65);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+}
+
+.glossary-pills-label {
+  font-size: 0.76rem;
+  font-weight: 800;
+  color: #7dd3fc;
+  margin-right: 2px;
+}
+
+.glossary-pill {
+  background: rgba(56, 189, 248, 0.14);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  color: #e0f2fe;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  min-height: 30px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  touch-action: manipulation;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.glossary-pill:hover {
+  background: rgba(56, 189, 248, 0.28);
+  transform: translateY(-1px);
+}
+
+/* Glossary Modal */
+.modal-top {
+  z-index: 80;
+}
+
+.glossary-modal-card {
+  max-width: 580px;
+}
+
+.glossary-summary-box {
+  background: rgba(56, 189, 248, 0.12);
+  border-left: 4px solid var(--primary);
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  font-weight: 700;
+  color: #f0f9ff;
+}
+
+.glossary-detail-box {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  color: var(--text);
+  font-size: 0.94rem;
+  line-height: 1.7;
+}
+
+/* Glossary Tab View */
+.glossary-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.glossary-search {
+  width: 100%;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 11px 14px;
+  color: #fff;
+  font-size: 0.96rem;
+}
+
+.glossary-search:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.glossary-filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.filter-chip {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  min-height: 34px;
+  touch-action: manipulation;
+}
+
+.filter-chip.active {
+  background: rgba(56, 189, 248, 0.2);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+.glossary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 14px;
+}
+
+.glossary-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.glossary-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.glossary-card h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  color: #fff;
+}
+
+.glossary-reading {
+  font-size: 0.78rem;
+  color: var(--primary);
+  font-weight: 700;
+}
+
+/* ================================
+   Lecture Reader Modal
+   ================================ */
+.modal-card-wide {
+  max-width: 960px;
+  height: 92vh;
+  max-height: 92vh;
+}
+
+.lecture-modal-header {
+  align-items: center;
+}
+
+.lecture-header-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.lecture-title-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.lecture-title-row h2 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.lecture-nav-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.lecture-select {
+  flex: 1;
+  min-width: 180px;
+  max-width: 380px;
+  font-family: inherit;
+  font-size: 0.86rem;
+}
+
+.lecture-modal-body {
+  padding: 0;
+  background: #f8fafc;
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.lecture-helper-bar {
+  background: #e0f2fe;
+  color: #0c4a6e;
+  border-bottom: 1px solid #bae6fd;
+  padding: 8px 16px;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.lecture-helper-bar .glossary-inline {
+  color: #0369a1;
+  border-bottom-color: #0284c7;
+  background: rgba(2, 132, 199, 0.12);
+}
+
+.lecture-paper {
+  background: #ffffff;
+  color: #1e293b;
+  padding: 22px 24px 36px;
+  font-size: 0.97rem;
+  line-height: 1.75;
+  overflow-wrap: anywhere;
+}
+
+.lecture-paper a {
+  color: #1d4ed8;
+  text-decoration: underline;
+  font-weight: 600;
+}
+
+.lecture-h1 {
+  font-size: 1.45rem;
+  color: #0f172a;
+  margin: 20px 0 10px;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 6px;
+}
+
+.lecture-h2 {
+  font-size: 1.24rem;
+  color: #0f172a;
+  margin: 24px 0 10px;
+  padding-bottom: 5px;
+  border-bottom: 2px solid #cbd5e1;
+}
+
+.lecture-h3 {
+  font-size: 1.08rem;
+  color: #1e293b;
+  margin: 18px 0 8px;
+}
+
+.lecture-h4 {
+  font-size: 1rem;
+  color: #334155;
+  margin: 14px 0 6px;
+}
+
+.lecture-p {
+  margin: 10px 0;
+  color: #1e293b;
+}
+
+.lecture-hr {
+  border: none;
+  border-top: 1px solid #e2e8f0;
+  margin: 20px 0;
+}
+
+.lecture-list {
+  margin: 10px 0;
+  padding-left: 22px;
+  color: #1e293b;
+}
+
+.lecture-list li {
+  margin: 5px 0;
+}
+
+.lecture-quote {
+  margin: 12px 0;
+  padding: 10px 14px;
+  background: #f1f5f9;
+  border-left: 4px solid #64748b;
+  border-radius: 6px;
+  color: #334155;
+}
+
+.lecture-inline-code {
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #be123c;
+  border-radius: 5px;
+  padding: 1px 5px;
+  font-family: "JetBrains Mono", "Fira Code", ui-monospace, monospace;
+  font-size: 0.88em;
+}
+
+.lecture-code-wrap {
+  margin: 12px 0;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid #1e293b;
+  background: #0f172a;
+}
+
+.lecture-code-lang {
+  background: #1e293b;
+  color: #94a3b8;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  letter-spacing: 0.8px;
+}
+
+.lecture-code {
+  margin: 0;
+  padding: 12px 14px;
+  overflow-x: auto;
+  color: #e2e8f0;
+  font-family: "JetBrains Mono", "Fira Code", ui-monospace, monospace;
+  font-size: 0.84rem;
+  line-height: 1.55;
+}
+
+.lecture-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  margin: 14px 0;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+}
+
+.lecture-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  color: #1e293b;
+  background: #fff;
+}
+
+.lecture-table th,
+.lecture-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid #e2e8f0;
+  border-right: 1px solid #e2e8f0;
+}
+
+.lecture-table th {
+  background: #f1f5f9;
+  color: #0f172a;
+  font-weight: 700;
+}
+
+.lecture-details {
+  margin: 12px 0;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  padding: 10px 14px;
+  background: #f8fafc;
+}
+
+.lecture-details summary {
+  cursor: pointer;
+  font-weight: 700;
+  color: #1d4ed8;
+  padding: 4px 0;
+  user-select: none;
+}
+
+.lecture-mermaid {
+  margin: 14px 0;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  overflow-x: auto;
+}
+
+.lecture-mermaid-label {
+  font-size: 0.76rem;
+  font-weight: 800;
+  color: #475569;
+  margin-bottom: 6px;
+}
+
+.lecture-mermaid pre.mermaid {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #334155;
+  white-space: pre-wrap;
+}
+
+.lecture-error-box {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+  border-radius: 10px;
+  padding: 16px;
+}
+
+@media (max-width: 640px) {
+  .modal-card-wide {
+    height: 96vh;
+    max-height: 96vh;
+    border-radius: 12px;
+  }
+
+  .lecture-modal-header {
+    padding: 12px;
+  }
+
+  .lecture-paper {
+    padding: 14px 12px 28px;
+    font-size: 0.94rem;
+  }
+
+  .lecture-select {
+    width: 100%;
+    max-width: none;
+    flex-basis: 100%;
+  }
+
+  .lecture-modal-footer {
+    flex-direction: row;
+  }
+
+  .lecture-modal-footer .btn {
+    flex: 1;
+  }
+
+  .glossary-grid {
+    grid-template-columns: 1fr;
+  }
+}
+

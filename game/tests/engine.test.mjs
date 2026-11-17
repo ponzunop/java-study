@@ -1,10 +1,16 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
 import { createRequire } from 'node:module';
+import { fileURLToPath } from 'node:url';
 
 const require = createRequire(import.meta.url);
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const Engine = require('../engine.js');
 const STAGES = require('../data/stages.js');
+const Glossary = require('../data/glossary.js');
+const Markdown = require('../markdown.js');
 
 test('stages data contains all 14 lessons, 140 quiz questions, 28 coding quests, and 14 code puzzles', () => {
   assert.equal(STAGES.length, 14);
@@ -202,4 +208,67 @@ test('normalizeState preserves backward compatibility with old v1 saves', () => 
   assert.deepEqual(norm.clearedStages, [1, 2]);
   assert.deepEqual(norm.solvedPuzzles, []);
   assert.deepEqual(norm.inventory, { potion: 1, scan50: 1, charm2x: 0 });
+});
+
+test('markdown renderer converts README.md and all 14 lesson files without raw markdown headings or fences', () => {
+  const rootDir = path.resolve(__dirname, '../..');
+  const files = ['README.md'];
+  for (let i = 1; i <= 14; i += 1) {
+    files.push(`lesson${String(i).padStart(2, '0')}.md`);
+  }
+
+  for (const file of files) {
+    const raw = fs.readFileSync(path.join(rootDir, file), 'utf8');
+    const html = Markdown.renderMarkdown(raw);
+    assert.ok(html.length > 500, `${file} rendered output too short`);
+    assert.ok(!/<p class="lecture-p">#{1,4}\s/.test(html), `Raw heading found in ${file}`);
+    assert.ok(!/<p class="lecture-p">```/.test(html), `Raw code fence found in ${file}`);
+    assert.ok(!/<p class="lecture-p">\|.*\|/.test(html), `Raw table pipe found in ${file}`);
+    assert.ok(html.includes('<pre class="lecture-code">'), `Expected code block in ${file}`);
+  }
+});
+
+test('markdown renderer handles details blocks containing code fences and tables', () => {
+  const sample = [
+    '<details>',
+    '<summary>解答を見る</summary>',
+    '',
+    '```java',
+    'int x = 10;',
+    '```',
+    '',
+    '| A | B |',
+    '| :--- | :--- |',
+    '| 1 | 2 |',
+    '</details>',
+  ].join('\n');
+
+  const html = Markdown.renderMarkdown(sample);
+  assert.ok(html.includes('<details class="lecture-details">'));
+  assert.ok(html.includes('<summary>解答を見る</summary>'));
+  assert.ok(html.includes('<pre class="lecture-code"><code>int x = 10;</code></pre>'));
+  assert.ok(html.includes('<table class="lecture-table">'));
+});
+
+test('glossary contains compile and core terms, matches text, and safely annotates HTML without breaking tags', () => {
+  const compileTerm = Glossary.getTermById('compile');
+  assert.ok(compileTerm);
+  assert.equal(compileTerm.term, 'コンパイル');
+  assert.ok(compileTerm.short.includes('翻訳'));
+
+  const ids = new Set();
+  for (const term of Glossary.TERMS) {
+    assert.ok(term.id && term.term && term.short && term.detail);
+    assert.ok(!ids.has(term.id), `Duplicate glossary id: ${term.id}`);
+    ids.add(term.id);
+  }
+
+  const matched = Glossary.findTermsInText('javac でソースコードをコンパイルしてクラスを作る');
+  assert.ok(matched.some((t) => t.id === 'compile'));
+  assert.ok(matched.some((t) => t.id === 'class'));
+
+  const inputHtml = '<p>まずコンパイルします。</p><pre class="code-block"><code>javac コンパイル</code></pre>';
+  const annotated = Glossary.annotateHtmlWithGlossary(inputHtml);
+  assert.ok(annotated.includes('data-glossary-id="compile"'));
+  assert.ok(annotated.includes('<pre class="code-block"><code>javac コンパイル</code></pre>'));
 });
